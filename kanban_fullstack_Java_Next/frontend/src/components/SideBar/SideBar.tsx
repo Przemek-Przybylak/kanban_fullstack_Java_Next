@@ -52,17 +52,17 @@ export default function SideBar() {
         <StatusWrapper loading={loading} error={error}>
           <ul className="space-y-4">
             {projects?.map((project) => (
-              <li key={project.projectId} className="flex flex-col gap-2">
+              <li key={project.id} className="flex flex-col gap-2">
                 <Link
                   className="mb-2 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all 
                   font-medium text-gray-800 hover:text-blue-600 border-l-4 border-blue-500"
-                  href={`/project/${project.projectId}`}
+                  href={`/project/${project.id}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {project.title}
                 </Link>
                 <Button
-                  onClick={() => deleteProject(project.projectId)}
+                  onClick={() => deleteProject(project.id)}
                   variant="danger"
                   className="w-full h-[40px] flex items-center justify-center"
                 >
