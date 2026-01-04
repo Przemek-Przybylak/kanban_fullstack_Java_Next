@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import {
   deleteProject,
-  fetchProject,
-  fetchProjects,
+  fetchProjectsFromApi,
+  fetchProjectFromApi,
   postProject,
   putProject,
 } from "../lib/api";
@@ -31,7 +31,7 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
   fetchProjects: async () => {
     set({ loading: true, error: null });
     try {
-      const projects: Project[] = await fetchProjects();
+      const projects: Project[] = await fetchProjectsFromApi();
       set({ projects, loading: false });
     } catch (error) {
       set({ error: (error as Error).message, loading: false });
