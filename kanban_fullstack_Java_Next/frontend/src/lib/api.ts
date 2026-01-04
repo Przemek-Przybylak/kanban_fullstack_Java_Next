@@ -1,122 +1,106 @@
 import { Project } from "../types/projects";
 import { Task } from "../types/task";
 
-export async function fetchProjects() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`);
-  if (!response.ok) throw new Error("Failed to fetch projects");
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const TOKEN = process.env.NEXT_PUBLIC_DEV_TOKEN;
 
+// Pomocnicze nagłówki z tokenem
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${TOKEN}`,
+};
+
+export async function fetchProjects() {
+  const response = await fetch(`${BASE_URL}/projects`, {
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
+  if (!response.ok) throw new Error("Failed to fetch projects");
   return response.json();
 }
 
 export const fetchProject = async (id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`
-  );
+  const response = await fetch(`${BASE_URL}/projects/${id}`, {
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
   if (!response.ok) throw new Error("Failed to fetch project");
   return response.json();
 };
 
 export const postProject = async (project: Project) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
+  const response = await fetch(`${BASE_URL}/projects`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS, // Używamy gotowych nagłówków
     body: JSON.stringify(project),
   });
-
-  if (!response.ok) throw new Error("Failed to add project");
-  return response.json();
+  if (!response.ok) {
+       // Wyciągnij błąd z serwera, żebyś wiedział CO dokładnie nie pasuje
+       const errorData = await response.json();
+       console.error("Błąd z backendu:", errorData);
+       throw new Error("Failed to add project");
+    }
+    return response.json();
 };
 
 export const putProject = async (id: string, project: Project) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(project),
-    }
-  );
-
-  if (!response.ok)
-    throw new Error(`Failed to edit project with id ${id}, ${project}`);
+  const response = await fetch(`${BASE_URL}/projects/${id}`, {
+    method: "PUT",
+    headers: HEADERS,
+    body: JSON.stringify(project),
+  });
+  if (!response.ok) throw new Error(`Failed to edit project with id ${id}`);
   return response.json();
 };
 
 export const deleteProject = async (id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`,
-    {
-      method: "DELETE",
-    }
-  );
-
-  await fetchProjects();
-
+  const response = await fetch(`${BASE_URL}/projects/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
   if (!response.ok) throw new Error(`Failed to delete project with id ${id}`);
   return response.status === 204;
 };
 
 export async function fetchTasksByProjectId(projectId: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${projectId}`
-  );
+  const response = await fetch(`${BASE_URL}/tasks/${projectId}`, {
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
   if (!response.ok) throw new Error("Failed to fetch tasks");
   return response.json();
 }
 
 export async function fetchTask(taskId: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`
-  );
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
   if (!response.ok) throw new Error("Failed to fetch task");
   return response.json();
 }
 
 export async function postTask(addedTask: Task) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${addedTask.projectId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ addedTask }),
-    }
-  );
-
+  const response = await fetch(`${BASE_URL}/tasks/${addedTask.projectId}`, {
+    method: "POST",
+    headers: HEADERS,
+    body: JSON.stringify(addedTask), // Poprawiłem: wysyłamy obiekt, nie {addedTask: addedTask}
+  });
   if (!response.ok) throw new Error("Failed to add task");
   return response.json();
 }
 
 export async function deleteTask(taskId: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
-    {
-      method: "DELETE",
-    }
-  );
-
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
   if (!response.ok) throw new Error(`Failed to delete task with id ${taskId}`);
   return response.status === 204;
 }
 
 export async function putTask(taskId: string, newData: Task) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newData),
-    }
-  );
-
-  if (!response.ok)
-    throw new Error(`Failed to edit task with id ${taskId}, ${newData}`);
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+    method: "PUT",
+    headers: HEADERS,
+    body: JSON.stringify(newData),
+  });
+  if (!response.ok) throw new Error(`Failed to edit task with id ${taskId}`);
   return response.json();
 }
