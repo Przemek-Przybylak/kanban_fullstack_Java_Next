@@ -1,11 +1,14 @@
 export interface Task {
-  taskId: string;
-  projectId: string;
+  id: string;
   title: string;
-  description: string;
-  dueDate?: string;
-  project?: string;
+  description: string | null;
   status: string;
-  assignees?: string[];
-  approvedBy?: string | undefined;
+  approvedBy: string | null;
+  dueDate?: string;
+  createdAt: string;
+  project: {
+               id: string;
+               title: string;
+               };
+
 }
