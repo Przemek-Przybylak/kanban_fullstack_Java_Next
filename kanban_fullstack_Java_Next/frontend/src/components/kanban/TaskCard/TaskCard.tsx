@@ -19,7 +19,7 @@ export default function TaskCard({ task }: { task: Task }) {
           <strong>Due:</strong> {dueDate}
         </div>
         <div>
-          <strong>Project:</strong> {project}
+          <strong>Project:</strong> {project.title}
         </div>
         <div>
           <strong>Status:</strong> <StatusBadge status={status} />
