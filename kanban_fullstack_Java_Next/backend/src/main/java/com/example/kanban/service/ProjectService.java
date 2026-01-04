@@ -84,12 +84,12 @@ public class ProjectService implements ProjectServiceInterface {
         User owner = getOwner(username);
         Project project = Mapper.fromDto(projectDto);
 
+        Project savedProject = projectRepository.save(project);
+
         project.getUsers().add(owner);
         owner.getProjects().add(project);
 
         checkProjectMembership(username, project);
-
-        Project savedProject = projectRepository.save(project);
 
         return Mapper.toDto(savedProject);
     }
