@@ -6,10 +6,11 @@ import {
   postProject,
   putProject,
 } from "../lib/api";
-import { Project } from "../types/projects";
+import ProjectRequest, { Project } from "../types/projects";
 
 interface ProjectsStore {
   project: Project | null;
+  projectRequest: ProjectRequest | null;
   projects: Project[];
   error: string | null;
   loading: boolean;
@@ -22,6 +23,7 @@ interface ProjectsStore {
 
 export const useProjectsStore = create<ProjectsStore>((set) => ({
   project: null,
+  projectRequest: null,
   projects: [],
   error: null,
   loading: false,
@@ -44,18 +46,31 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
       set({ error: (error as Error).message, loading: false });
     }
   },
-  sendProject: async (project: Project) => {
-    set({ loading: true, error: null });
-    try {
-      const createdProject = await postProject(project);
-      set((state) => ({
-        projects: [...state.projects, createdProject],
-        loading: false,
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message, loading: false });
-    }
-  },
+sendProject: async (dto: CreateProjectRequestDTO) => {
+  set({ loading: true, error: null });
+
+  try {
+    const createdProject = await postProject(dto);
+
+    set((state) => ({
+      ...state,
+      projects: [...state.projects, createdProject],
+      loading: false,
+    }));
+
+//     return createdProject;
+
+  } catch (error: any) {
+    const message = error.response?.data?.message || error.message || "Coś poszło nie tak";
+
+    set({
+      error: message,
+      loading: false
+    });
+
+    throw error;
+  }
+},
   updateProject: async (id: string, project: Project) => {
     set({ loading: true, error: null });
     try {
