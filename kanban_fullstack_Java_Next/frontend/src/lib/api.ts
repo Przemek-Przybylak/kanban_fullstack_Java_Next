@@ -10,7 +10,7 @@ const HEADERS = {
   "Authorization": `Bearer ${TOKEN}`,
 };
 
-export async function fetchProjects() {
+export async function fetchProjectsFromApi() {
   const response = await fetch(`${BASE_URL}/projects`, {
     headers: { "Authorization": `Bearer ${TOKEN}` }
   });
@@ -18,7 +18,7 @@ export async function fetchProjects() {
   return response.json();
 }
 
-export const fetchProject = async (id: string) => {
+export const fetchProjectFromApi = async (id: string) => {
   const response = await fetch(`${BASE_URL}/projects/${id}`, {
     headers: { "Authorization": `Bearer ${TOKEN}` }
   });
@@ -29,11 +29,10 @@ export const fetchProject = async (id: string) => {
 export const postProject = async (project: Project) => {
   const response = await fetch(`${BASE_URL}/projects`, {
     method: "POST",
-    headers: HEADERS, // Używamy gotowych nagłówków
+    headers: HEADERS,
     body: JSON.stringify(project),
   });
   if (!response.ok) {
-       // Wyciągnij błąd z serwera, żebyś wiedział CO dokładnie nie pasuje
        const errorData = await response.json();
        console.error("Błąd z backendu:", errorData);
        throw new Error("Failed to add project");
@@ -61,7 +60,7 @@ export const deleteProject = async (id: string) => {
 };
 
 export async function fetchTasksByProjectId(projectId: string) {
-  const response = await fetch(`${BASE_URL}/tasks/${projectId}`, {
+  const response = await fetch(`${BASE_URL}/projects/${projectId}/tasks`, {
     headers: { "Authorization": `Bearer ${TOKEN}` }
   });
   if (!response.ok) throw new Error("Failed to fetch tasks");
