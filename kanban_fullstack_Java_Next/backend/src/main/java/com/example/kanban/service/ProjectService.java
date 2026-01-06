@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,6 +131,10 @@ public class ProjectService implements ProjectServiceInterface {
         Project project = getProjectIfExisting(id);
 
         checkProjectMembership(username, project);
+
+        for (User user : new ArrayList<>(project.getUsers())) {
+            user.getProjects().remove(project);
+        }
 
         projectRepository.delete(project);
     }
