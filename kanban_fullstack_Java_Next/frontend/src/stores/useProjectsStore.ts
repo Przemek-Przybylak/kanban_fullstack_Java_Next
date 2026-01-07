@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import {
-  deleteProject,
+  deleteProjectFromApi,
   fetchProjectsFromApi,
   fetchProjectFromApi,
   postProject,
@@ -89,9 +89,9 @@ sendProject: async (dto: CreateProjectRequestDTO) => {
   deleteProject: async (id: string) => {
     set({ loading: true, error: null });
     try {
-      await deleteProject(id);
+      await deleteProjectFromApi(id);
       set((state) => ({
-        projects: state.projects.filter((p) => p.projectId !== id),
+        projects: state.projects.filter((p) => p.id !== id),
         loading: false,
       }));
     } catch (error) {
