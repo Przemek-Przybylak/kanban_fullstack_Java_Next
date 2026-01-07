@@ -50,7 +50,7 @@ export const putProject = async (id: string, project: Project) => {
   return response.json();
 };
 
-export const deleteProject = async (id: string) => {
+export const deleteProjectFromApi = async (id: string) => {
   const response = await fetch(`${BASE_URL}/projects/${id}`, {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${TOKEN}` }
