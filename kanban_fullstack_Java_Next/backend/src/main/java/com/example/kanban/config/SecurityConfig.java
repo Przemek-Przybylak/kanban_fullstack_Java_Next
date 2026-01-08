@@ -31,13 +31,14 @@ public class SecurityConfig {
                     corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:3000"));
                     corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    corsConfiguration.setAllowCredentials(true); // <--- DODAJ TO (Ważne dla Next.js)
                     return corsConfiguration;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/auth/**", "/error").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS,"/**", "/auth/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS musi być PIERWSZE
+                        .requestMatchers("/auth/**", "/error").permitAll()      // Usuń HttpMethod.POST, puszczaj całe /auth/
                         .requestMatchers(HttpMethod.GET, "/projects/**").permitAll()
                         .anyRequest().authenticated()
                 )
