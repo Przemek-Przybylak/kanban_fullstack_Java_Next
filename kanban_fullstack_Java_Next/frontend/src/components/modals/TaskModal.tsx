@@ -21,7 +21,7 @@ export default function TaskModal() {
     approvedBy,
     dueDate,
     createdAt,
-    project
+    project,
   } = task;
 
   return (
@@ -29,7 +29,7 @@ export default function TaskModal() {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">{title}</h2>
       <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-6">
         <span>
-          Projekt: <strong className="text-gray-700">{project}</strong>
+          Projekt: <strong className="text-gray-700">{project.title}</strong>
         </span>
         <span>
           Termin: <strong className="text-gray-700">{dueDate}</strong>
