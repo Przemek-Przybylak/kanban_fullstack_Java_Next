@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import {
-  deleteTask,
   fetchTasksByProjectId,
   fetchTask,
   postTask,
   putTask,
+  deleteTaskFromApi,
 } from "../lib/api";
 import { Task } from "../types/task";
 
@@ -63,7 +63,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
   deleteTask: async (taskId: string) => {
     set({ loading: true, error: null });
     try {
-      await deleteTask(taskId);
+      await deleteTaskFromApi(taskId);
       set((state) => ({
         tasks: state.tasks.filter((task) => task.id !== taskId),
       }));
