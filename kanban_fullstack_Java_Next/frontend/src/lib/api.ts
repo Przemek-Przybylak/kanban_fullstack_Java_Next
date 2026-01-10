@@ -85,12 +85,12 @@ export async function postTask(addedTask: Task) {
   return response.json();
 }
 
-export async function deleteTask(taskId: string) {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+export async function deleteTaskFromApi(id: string) {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
-  if (!response.ok) throw new Error(`Failed to delete task with id ${taskId}`);
+  if (!response.ok) throw new Error(`Failed to delete task with id ${id}`);
   return response.status === 204;
 }
 
