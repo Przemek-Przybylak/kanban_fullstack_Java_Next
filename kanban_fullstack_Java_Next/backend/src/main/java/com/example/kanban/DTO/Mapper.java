@@ -46,15 +46,24 @@ public class Mapper {
     }
 
     public static TaskResponseDto toDto(Task entity) {
+        shortProjectDto projectDto = null;
+
+        if (entity.getProject() != null) {
+            projectDto = new shortProjectDto(
+                    entity.getProject().getId(),
+                    entity.getProject().getTitle()
+            );
+        }
+
         return new TaskResponseDto(
                 entity.getId(),
                 entity.getTitle(),
                 entity.getDescription(),
-                entity.getStatus(),
+                entity.getStatus() != null ? entity.getStatus() : "TODO",
                 entity.getApprovedBy(),
                 entity.getDueDate(),
                 entity.getCreatedAt(),
-                new shortProjectDto(entity.getProject().getId(), entity.getProject().getTitle())
+                projectDto
         );
     }
 
