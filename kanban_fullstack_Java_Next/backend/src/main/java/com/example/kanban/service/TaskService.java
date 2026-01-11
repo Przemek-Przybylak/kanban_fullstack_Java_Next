@@ -98,8 +98,10 @@ public class TaskService implements TaskServiceInterface {
 
     private void checkTaskMembership(String username, Task task) {
 
-        if (task.getUser() == null || !task.getUser().getUsername().equals(username)) {
-            throw new AccessDeniedException("You don't have access to this task");
+        if (task.getUser() != null) {
+            if (!task.getUser().getUsername().equals(username)) {
+                throw new AccessDeniedException("You don't have access to this task");
+            }
         }
     }
 }
