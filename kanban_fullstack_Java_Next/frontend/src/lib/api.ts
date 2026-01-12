@@ -75,11 +75,11 @@ export async function fetchTask(taskId: string) {
   return response.json();
 }
 
-export async function postTask(addedTask: Task) {
-  const response = await fetch(`${BASE_URL}/tasks/${addedTask.id}`, {
+export async function postTask(addedTask: Task, projectId: string) {
+  const response = await fetch(`${BASE_URL}/project/${projectId}/tasks`, {
     method: "POST",
     headers: HEADERS,
-    body: JSON.stringify(addedTask), // Poprawiłem: wysyłamy obiekt, nie {addedTask: addedTask}
+    body: JSON.stringify(addedTask),
   });
   if (!response.ok) throw new Error("Failed to add task");
   return response.json();
