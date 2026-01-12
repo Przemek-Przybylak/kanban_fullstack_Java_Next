@@ -48,7 +48,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ loading: false });
     }
   },
-  addTask: async (addedTask: Task) => {
+  addTask: async (addedTask: Task, projectId: string) => {
     set({ loading: true, error: null });
     try {
       const task = await postTask(addedTask);
