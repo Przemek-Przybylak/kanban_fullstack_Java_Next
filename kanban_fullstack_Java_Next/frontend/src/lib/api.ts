@@ -75,8 +75,8 @@ export async function fetchTask(taskId: string) {
   return response.json();
 }
 
-export async function postTask(addedTask: Task, projectId: string) {
-  const response = await fetch(`${BASE_URL}/project/${projectId}/tasks`, {
+export async function postTask(addedTask: Task) {
+  const response = await fetch(`${BASE_URL}/project/${addedTask.projectId}/tasks`, {
     method: "POST",
     headers: HEADERS,
     body: JSON.stringify(addedTask),
