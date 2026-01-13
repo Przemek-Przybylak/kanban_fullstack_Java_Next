@@ -60,7 +60,6 @@ export default function TaskFormModal() {
       if (type === "addTask") {
         await addTask({
           ...taskData,
-          projectId,
           taskId: Math.random().toString(36).substring(2, 9),
         });
       } else if (type === "editTask") {
