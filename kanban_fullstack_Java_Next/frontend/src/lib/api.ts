@@ -1,3 +1,4 @@
+import { PostTask } from "../types/postTask";
 import CreateProjectRequestDTO, { Project } from "../types/projects";
 import { Task } from "../types/task";
 
@@ -75,12 +76,15 @@ export async function fetchTask(taskId: string) {
   return response.json();
 }
 
-export async function postTask(addedTask: Task) {
-  const response = await fetch(`${BASE_URL}/project/${addedTask.projectId}/tasks`, {
-    method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify(addedTask),
-  });
+export async function postTask(addedTask: PostTask) {
+  const response = await fetch(
+    `${BASE_URL}/projects/${addedTask.project.id}/tasks`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify(addedTask),
+    }
+  );
   if (!response.ok) throw new Error("Failed to add task");
   return response.json();
 }
