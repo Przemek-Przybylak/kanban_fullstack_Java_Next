@@ -7,6 +7,7 @@ import {
   deleteTaskFromApi,
 } from "../lib/api";
 import { Task } from "../types/task";
+import { PostTask } from "../types/postTask";
 
 interface TasksStore {
   tasks: Task[];
@@ -15,7 +16,7 @@ interface TasksStore {
   error: string | null;
   fetchTasksByProjectId: (projectId: string) => Promise<void>;
   fetchTask: (projectId: string, taskId: string) => Promise<void>;
-  addTask: (addedTask: Task) => Promise<void>;
+  addTask: (addedTask: PostTask) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   editTask: (taskId: string, newData: Partial<Task>) => Promise<void>;
 }
@@ -48,7 +49,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ loading: false });
     }
   },
-  addTask: async (addedTask: Task, projectId: string) => {
+  addTask: async (addedTask: PostTask) => {
     set({ loading: true, error: null });
     try {
       const task = await postTask(addedTask);
