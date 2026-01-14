@@ -8,6 +8,8 @@ import { useTasksStore } from "../../stores/useTasksStore";
 import Input from "../Input/Input";
 import { Task } from "../../types/task";
 import { useParams } from "next/navigation";
+import { title } from "process";
+import { PostTask } from "../../types/postTask";
 
 export default function TaskFormModal() {
   const projectId = useParams().id as string;
@@ -16,15 +18,18 @@ export default function TaskFormModal() {
 
   const [assigneeInput, setAssigneeInput] = useState("");
   const [taskData, setTaskData] = useState<Task>({
-    taskId: "",
-    projectId,
+    id: "",
     title: "",
     description: "",
     dueDate: "",
     status: "todo",
-    assignees: [],
     approvedBy: "",
-    project: "",
+    createdAt: "",
+    username: "",
+    project: {
+      id: projectId,
+      title: "",
+    },
   });
 
   useEffect(() => {
@@ -35,17 +40,7 @@ export default function TaskFormModal() {
     }
 
     if (type === "addTask") {
-      setTaskData({
-        taskId: "",
-        projectId,
-        title: "",
-        description: "",
-        dueDate: "",
-        status: "todo",
-        assignees: [],
-        approvedBy: "",
-        project: "",
-      });
+      setTaskData(taskData);
     }
   }, [isOpen, type, data, projectId]);
 
@@ -56,14 +51,21 @@ export default function TaskFormModal() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const taskToPost: PostTask = {
+      title: taskData.title,
+      description: taskData.description,
+      status: taskData.status,
+      dueDate: taskData.dueDate,
+      approvedBy: taskData.approvedBy,
+      username: taskData.username,
+      projectId: projectId,
+    };
+
     try {
       if (type === "addTask") {
-        await addTask({
-          ...taskData,
-          taskId: Math.random().toString(36).substring(2, 9),
-        });
+        await addTask(taskToPost);
       } else if (type === "editTask") {
-        await editTask(taskData.taskId, taskData);
+        await editTask(taskData.id, taskData);
       }
 
       closeModal();
@@ -76,7 +78,6 @@ export default function TaskFormModal() {
     if (assigneeInput.trim() !== "") {
       setTaskData({
         ...taskData,
-        assignees: [...(taskData.assignees ?? []), assigneeInput.trim()],
       });
       setAssigneeInput("");
     }
@@ -85,7 +86,6 @@ export default function TaskFormModal() {
   const removeAssignee = (index: number) => {
     setTaskData({
       ...taskData,
-      assignees: (taskData.assignees ?? []).filter((_, i) => i !== index),
     });
   };
 
@@ -113,7 +113,9 @@ export default function TaskFormModal() {
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={3}
-              value={taskData.description}
+              {...(taskData.description && {
+                defaultValue: taskData.description,
+              })}
               onChange={(e) =>
                 setTaskData({ ...taskData, description: e.target.value })
               }
@@ -166,27 +168,15 @@ export default function TaskFormModal() {
             </button>
           </div>
 
-          {taskData.assignees && taskData.assignees.length > 0 && (
+          {taskData.username && (
             <div className="bg-gray-50 p-3 rounded-md">
               <h3 className="text-sm font-medium text-gray-700 mb-2">
                 Assigned to:
               </h3>
               <ul className="space-y-1">
-                {taskData.assignees.map((assignee, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center justify-between bg-white px-3 py-1 rounded"
-                  >
-                    <span>{assignee}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeAssignee(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
+                <li className="flex items-center justify-between bg-white px-3 py-1 rounded">
+                  <span>{taskData.username}</span>
+                </li>
               </ul>
             </div>
           )}
