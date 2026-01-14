@@ -1,14 +1,14 @@
 export interface Task {
   id: string;
   title: string;
-  description: string | null;
+  description: string;
   status: string;
-  approvedBy: string | null;
+  approvedBy: string | undefined;
   dueDate?: string;
   createdAt: string;
+  username?: string;
   project: {
-               id: string;
-               title: string;
-               };
-
+    id: string;
+    title: string;
+  };
 }
