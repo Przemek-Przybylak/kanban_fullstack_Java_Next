@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
@@ -47,13 +48,14 @@ public class ProjectService implements ProjectServiceInterface {
     @Override
     public TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username) {
         Project project = getProjectIfExisting(projectId);
-        User owner = getOwner(username);
-
         checkProjectMembership(username, project);
 
         Task task = Mapper.fromDto(taskDto);
 
-        task.setUser(owner);
+        User user = userRepository.findByUsername(taskDto.username())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User nie istnieje"));
+
+        task.setUser(user);
         task.setProject(project);
 
         taskRepository.save(task);
