@@ -57,7 +57,7 @@ export default function TaskFormModal() {
       status: taskData.status,
       dueDate: taskData.dueDate,
       approvedBy: taskData.approvedBy,
-      username: taskData.username,
+      username: assigneeInput,
       projectId: projectId,
     };
 
