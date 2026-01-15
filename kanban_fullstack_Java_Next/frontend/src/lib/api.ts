@@ -78,7 +78,7 @@ export async function fetchTask(taskId: string) {
 
 export async function postTask(addedTask: PostTask) {
   const response = await fetch(
-    `${BASE_URL}/projects/${addedTask.project.id}/tasks`,
+    `${BASE_URL}/projects/${addedTask.projectId}/tasks`,
     {
       method: "POST",
       headers: HEADERS,
