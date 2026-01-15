@@ -4,8 +4,7 @@ import com.example.kanban.validation.OnCreate;
 import com.example.kanban.validation.OnUpdate;
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
 public record TaskRequestDto(
 
@@ -14,8 +13,10 @@ public record TaskRequestDto(
         @NotBlank(groups = {OnCreate.class, OnUpdate.class}, message = "Description is required")
         String description,
         @NotBlank(groups = {OnCreate.class, OnUpdate.class}, message = "Status is required")
-        LocalDateTime dueDate,
         String status,
-        String user,
-        String approvedBy) {
+        LocalDate dueDate,
+        String approvedBy,
+        String username,
+        String projectId
+) {
 }
