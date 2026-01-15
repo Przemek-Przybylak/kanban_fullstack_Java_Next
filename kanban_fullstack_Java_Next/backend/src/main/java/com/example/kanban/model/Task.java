@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -27,10 +28,9 @@ public class Task implements HasId {
     @Column(length = 1000)
     private String description;
 
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private LocalDateTime createdAt;
     private String status;
-
     private String approvedBy;
 
     @ManyToOne
