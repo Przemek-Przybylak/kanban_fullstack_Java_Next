@@ -6,6 +6,8 @@ import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
+import com.example.kanban.user.model.User;
+import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,10 +22,12 @@ import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 @Service
 public class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
-    public TaskService(TaskRepository taskRepository, UserService userService) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
     }
 
@@ -50,6 +54,8 @@ public class TaskService implements TaskServiceInterface {
     public TaskResponseDto editTask(String id, TaskRequestDto taskDto, String username) {
         Task existingTask = getTaskIfExisting(id);
 
+        User user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         checkTaskMembership(username, existingTask);
 
         existingTask.setTitle(taskDto.title());
@@ -57,6 +63,7 @@ public class TaskService implements TaskServiceInterface {
         existingTask.setStatus(taskDto.status());
         existingTask.setDueDate(taskDto.dueDate());
         existingTask.setApprovedBy(taskDto.approvedBy());
+        existingTask.setUser(user);
 
         Task savedTask = taskRepository.save(existingTask);
         return Mapper.toDto(savedTask);
