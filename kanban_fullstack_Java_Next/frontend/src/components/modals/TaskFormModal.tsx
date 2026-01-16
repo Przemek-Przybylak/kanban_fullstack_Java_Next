@@ -8,32 +8,26 @@ import { useTasksStore } from "../../stores/useTasksStore";
 import Input from "../Input/Input";
 import { Task } from "../../types/task";
 import { useParams } from "next/navigation";
-import { title } from "process";
 import { PostTask } from "../../types/postTask";
-import { init } from "next/dist/compiled/webpack/webpack";
+
+const getInitialTaskData = (projectId: string): Task => ({
+  id: "",
+  title: "",
+  description: "",
+  dueDate: "",
+  status: "todo",
+  approvedBy: "",
+  createdAt: "",
+  username: "",
+  project: { id: projectId, title: "" },
+});
 
 export default function TaskFormModal() {
   const projectId = useParams().id as string;
   const { type, isOpen, closeModal, data } = useModalStore();
   const { addTask, editTask } = useTasksStore();
 
-  const initialTaskData: Task = {
-    id: "",
-    title: "",
-    description: "",
-    dueDate: "",
-    status: "todo",
-    approvedBy: "",
-    createdAt: "",
-    username: "",
-    project: {
-      id: projectId,
-      title: "",
-    },
-  };
-
-  const [assigneeInput, setAssigneeInput] = useState("");
-  const [taskData, setTaskData] = useState<Task>(initialTaskData);
+  const [taskData, setTaskData] = useState<Task>(getInitialTaskData(projectId));
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,8 +35,7 @@ export default function TaskFormModal() {
     if (type === "editTask" && data) {
       setTaskData(data as Task);
     } else if (type === "addTask") {
-      setTaskData(initialTaskData);
-      setAssigneeInput("");
+      setTaskData(getInitialTaskData(projectId));
     }
   }, [isOpen, type, data, projectId]);
 
@@ -59,36 +52,21 @@ export default function TaskFormModal() {
       status: taskData.status,
       dueDate: taskData.dueDate,
       approvedBy: taskData.approvedBy,
-      username: assigneeInput,
+      username: taskData.username,
       projectId: projectId,
     };
 
     try {
       if (type === "addTask") {
         await addTask(taskToPost);
-      } else if (type === "editTask") {
-        await editTask(taskData.id, taskData);
+      } else if (type === "editTask" && data) {
+        await editTask(data.id, taskData);
       }
 
       closeModal();
     } catch (error) {
       console.error("Error saving task:", error);
     }
-  };
-
-  const handleAddAssignee = () => {
-    if (assigneeInput.trim() !== "") {
-      setTaskData({
-        ...taskData,
-      });
-      setAssigneeInput("");
-    }
-  };
-
-  const removeAssignee = (index: number) => {
-    setTaskData({
-      ...taskData,
-    });
   };
 
   return (
@@ -115,9 +93,7 @@ export default function TaskFormModal() {
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={3}
-              {...(taskData.description && {
-                defaultValue: taskData.description,
-              })}
+              value={taskData.description}
               onChange={(e) =>
                 setTaskData({ ...taskData, description: e.target.value })
               }
@@ -158,16 +134,11 @@ export default function TaskFormModal() {
             <Input
               label="Assignee"
               type="text"
-              value={assigneeInput}
-              onChange={(e) => setAssigneeInput(e.target.value)}
+              value={taskData.username || ""}
+              onChange={(e) =>
+                setTaskData({ ...taskData, username: e.target.value })
+              }
             />
-            <button
-              type="button"
-              onClick={handleAddAssignee}
-              className="self-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              Add
-            </button>
           </div>
 
           {taskData.username && (
