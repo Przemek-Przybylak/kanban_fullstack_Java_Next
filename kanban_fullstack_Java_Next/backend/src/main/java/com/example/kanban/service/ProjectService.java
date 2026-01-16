@@ -38,7 +38,7 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
-    public List<TaskResponseDto> getTaskByProject(String id) {
+    public List<TaskResponseDto> getTasksByProject(String id) {
         return taskRepository.findByProjectId(id).stream()
                 .map(Mapper::toDto)
                 .toList();
@@ -53,7 +53,7 @@ public class ProjectService implements ProjectServiceInterface {
         Task task = Mapper.fromDto(taskDto);
 
         User user = userRepository.findByUsername(taskDto.username())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User nie istnieje"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not exist"));
 
         task.setUser(user);
         task.setProject(project);
