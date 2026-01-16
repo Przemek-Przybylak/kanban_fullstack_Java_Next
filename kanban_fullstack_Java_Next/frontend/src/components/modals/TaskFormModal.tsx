@@ -10,14 +10,14 @@ import { Task } from "../../types/task";
 import { useParams } from "next/navigation";
 import { title } from "process";
 import { PostTask } from "../../types/postTask";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 export default function TaskFormModal() {
   const projectId = useParams().id as string;
   const { type, isOpen, closeModal, data } = useModalStore();
   const { addTask, editTask } = useTasksStore();
 
-  const [assigneeInput, setAssigneeInput] = useState("");
-  const [taskData, setTaskData] = useState<Task>({
+  const initialTaskData: Task = {
     id: "",
     title: "",
     description: "",
@@ -30,17 +30,19 @@ export default function TaskFormModal() {
       id: projectId,
       title: "",
     },
-  });
+  };
+
+  const [assigneeInput, setAssigneeInput] = useState("");
+  const [taskData, setTaskData] = useState<Task>(initialTaskData);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    if (type === "editTask" && data && "taskId" in data) {
+    if (type === "editTask" && data) {
       setTaskData(data as Task);
-    }
-
-    if (type === "addTask") {
-      setTaskData(taskData);
+    } else if (type === "addTask") {
+      setTaskData(initialTaskData);
+      setAssigneeInput("");
     }
   }, [isOpen, type, data, projectId]);
 
