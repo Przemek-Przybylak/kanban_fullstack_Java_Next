@@ -1,8 +1,6 @@
 package com.example.kanban.service;
 
 import com.example.kanban.DTO.*;
-import com.example.kanban.model.Project;
-import com.example.kanban.model.Task;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.List;
 public interface ProjectServiceInterface {
 
     @Transactional
-    List<TaskResponseDto> getTaskByProject(String id);
+    List<TaskResponseDto> getTasksByProject(String id);
 
     @Transactional
     TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username);
