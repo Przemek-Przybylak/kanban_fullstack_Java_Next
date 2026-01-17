@@ -20,11 +20,11 @@ import java.util.List;
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
-public class TaskService implements TaskServiceInterface {
+public final class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(final TaskRepository taskRepository, final UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
     }
@@ -32,7 +32,7 @@ public class TaskService implements TaskServiceInterface {
     @Transactional(readOnly = true)
     @Override
     public List<TaskResponseDto> getAllTasks() {
-        List<Task> allTasks = taskRepository.findAll();
+        var allTasks = taskRepository.findAll();
 
         return allTasks.stream()
                 .map(Mapper::toDto)
@@ -41,18 +41,18 @@ public class TaskService implements TaskServiceInterface {
 
     @Transactional(readOnly = true)
     @Override
-    public TaskResponseDto getTask(String id) {
-        Task task = getTaskIfExisting(id);
+    public TaskResponseDto getTask(final String id) {
+        final var task = getTaskIfExisting(id);
 
         return Mapper.toDto(task);
     }
 
     @Transactional
     @Override
-    public TaskResponseDto editTask(String id, TaskRequestDto taskDto, String username) {
+    public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
-        User user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         checkTaskMembership(username, existingTask);
 
@@ -63,14 +63,14 @@ public class TaskService implements TaskServiceInterface {
         existingTask.setApprovedBy(taskDto.approvedBy());
         existingTask.setUser(user);
 
-        Task savedTask = taskRepository.save(existingTask);
+        final var savedTask = taskRepository.save(existingTask);
         return Mapper.toDto(savedTask);
     }
 
     @Transactional
     @Override
-    public TaskResponseDto editPartialTask(String id, TaskPatchRequestDto taskDto, String username) {
-        Task existingTask = getTaskIfExisting(id);
+    public TaskResponseDto editPartialTask(final String id, final TaskPatchRequestDto taskDto, final String username) {
+        var existingTask = getTaskIfExisting(id);
 
         checkTaskMembership(username, existingTask);
 
@@ -81,14 +81,14 @@ public class TaskService implements TaskServiceInterface {
         updateIfNotNull(taskDto.title(), existingTask::setTitle);
 
 
-        Task savedTask = taskRepository.save(existingTask);
+        final var savedTask = taskRepository.save(existingTask);
         return Mapper.toDto(savedTask);
     }
 
     @Transactional
     @Override
-    public void deleteTask(String id, String username) {
-        Task task = taskRepository.findById(id)
+    public void deleteTask(final String id, final String username) {
+        final var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         checkTaskMembership(username, task);
@@ -96,12 +96,12 @@ public class TaskService implements TaskServiceInterface {
         taskRepository.delete(task);
     }
 
-    private Task getTaskIfExisting(String id) {
+    private Task getTaskIfExisting(final String id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
     }
 
-    private void checkTaskMembership(String username, Task task) {
+    private void checkTaskMembership(final String username, final Task task) {
 
         if (task.getUser() != null) {
             if (!task.getUser().getUsername().equals(username)) {
