@@ -16,26 +16,26 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public final class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserService(final UserRepository userRepository, final PasswordEncoder passwordEncoder, final JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
     @Transactional
-    public User register(RegisterRequestDto requestDto) {
+    public User register(final RegisterRequestDto requestDto) {
         Optional<User> isUsernameUse = userRepository.findByUsername(requestDto.
                 username());
         if (isUsernameUse.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already used");
         }
 
-        User user = new User();
+        var user = new User();
         user.setRole(Role.USER);
         user.setUsername(requestDto.username());
         user.setPassword(passwordEncoder.encode(requestDto.password()));
@@ -43,8 +43,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserResponseDto login(LoginRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.username())
+    public UserResponseDto login(final LoginRequestDto requestDto) {
+        final var user = userRepository.findByUsername(requestDto.username())
                 .orElseThrow(
                         () -> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND, "User not found"));
@@ -56,13 +56,14 @@ public class UserService {
             );
         }
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        final String token = jwtUtil.generateToken(user.getUsername());
 
         return new UserResponseDto(token, user.getId(), user.getRole(), user.getUsername());
     }
 
     @Transactional
     public User getUserById(String id) {
+
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
