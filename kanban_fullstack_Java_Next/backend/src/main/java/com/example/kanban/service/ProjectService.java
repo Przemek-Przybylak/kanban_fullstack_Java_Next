@@ -3,7 +3,6 @@ package com.example.kanban.service;
 import com.example.kanban.DTO.*;
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
-import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
@@ -21,14 +20,14 @@ import java.util.Objects;
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
-public class ProjectService implements ProjectServiceInterface {
+public final class ProjectService implements ProjectServiceInterface {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
 
-    public ProjectService(ProjectRepository projectRepository, TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
+    public ProjectService(final ProjectRepository projectRepository, final TaskRepository taskRepository, final UserRepository userRepository, final UserService userService) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
@@ -37,21 +36,23 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
-    public List<TaskResponseDto> getTasksByProject(String id) {
-        return taskRepository.findByProjectId(id).stream()
+    public List<TaskResponseDto> getTasksByProject(final String id) {
+        final var taskList = taskRepository.findByProjectId(id).stream()
                 .map(Mapper::toDto)
                 .toList();
+
+        return taskList;
     }
 
     @Transactional
     @Override
-    public TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username) {
-        Project project = getProjectIfExisting(projectId);
+    public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
+        final Project project = getProjectIfExisting(projectId);
         checkProjectMembership(username, project);
 
-        Task task = Mapper.fromDto(taskDto);
+        var task = Mapper.fromDto(taskDto);
 
-        User user = userRepository.findByUsername(taskDto.username())
+        final var user = userRepository.findByUsername(taskDto.username())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not exist"));
 
         task.setUser(user);
@@ -65,7 +66,7 @@ public class ProjectService implements ProjectServiceInterface {
     @Transactional(readOnly = true)
     @Override
     public List<ProjectResponseDto> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
+        final var projects = projectRepository.findAll();
 
         return projects.stream()
                 .map(Mapper::toDto)
@@ -74,19 +75,19 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional(readOnly = true)
     @Override
-    public ProjectResponseDto getProject(String id) {
-        Project project = getProjectIfExisting(id);
+    public ProjectResponseDto getProject(final String id) {
+        final var project = getProjectIfExisting(id);
 
         return Mapper.toDto(project);
     }
 
     @Transactional
     @Override
-    public ProjectResponseDto addProject(ProjectRequestDto projectDto, String username) {
-        User owner = getOwner(username);
-        Project project = Mapper.fromDto(projectDto);
+    public ProjectResponseDto addProject(final ProjectRequestDto projectDto, final String username) {
+        var owner = getOwner(username);
+        var project = Mapper.fromDto(projectDto);
 
-        Project savedProject = projectRepository.save(project);
+        final var savedProject = projectRepository.save(project);
 
         project.getUsers().add(owner);
         owner.getProjects().add(project);
@@ -98,22 +99,22 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
-    public ProjectResponseDto editProject(String id, ProjectRequestDto projectDto, String username) {
-        Project existingProject = getProjectIfExisting(id);
+    public ProjectResponseDto editProject(final String id, final ProjectRequestDto projectDto, final String username) {
+        var existingProject = getProjectIfExisting(id);
 
         checkProjectMembership(username, existingProject);
 
         existingProject.setTitle(projectDto.title());
         existingProject.setDescription(projectDto.description());
 
-        Project savedProject = projectRepository.save(existingProject);
+        final var savedProject = projectRepository.save(existingProject);
 
         return Mapper.toDto(savedProject);
     }
 
     @Transactional
     @Override
-    public ProjectResponseDto editPartialProject(String id, ProjectPatchRequestDto project, String username) {
+    public ProjectResponseDto editPartialProject(final String id, final ProjectPatchRequestDto project, final String username) {
         Project existingProject = getProjectIfExisting(id);
 
         checkProjectMembership(username, existingProject);
@@ -121,15 +122,15 @@ public class ProjectService implements ProjectServiceInterface {
         updateIfNotNull(project.description(), existingProject::setDescription);
         updateIfNotNull(project.title(), existingProject::setTitle);
 
-        Project savedProject = projectRepository.save(existingProject);
+        final var savedProject = projectRepository.save(existingProject);
 
         return Mapper.toDto(savedProject);
     }
 
     @Transactional
     @Override
-    public void deleteProject(String id, String username) {
-        Project project = getProjectIfExisting(id);
+    public void deleteProject(final String id, final String username) {
+        var project = getProjectIfExisting(id);
 
         checkProjectMembership(username, project);
 
@@ -143,17 +144,17 @@ public class ProjectService implements ProjectServiceInterface {
         projectRepository.delete(project);
     }
 
-    private Project getProjectIfExisting(String id) {
+    private Project getProjectIfExisting(final String id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
     }
 
-    private User getOwner(String username) {
+    private User getOwner(final String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    private void checkProjectMembership(String username, Project project) {
+    private void checkProjectMembership(final String username, final Project project) {
         String ownerId = userService.getUserIdFromUsername(username);
 
         boolean isMember = project.getUsers().stream()
