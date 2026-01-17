@@ -23,12 +23,10 @@ import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 public class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
     }
 
     @Transactional(readOnly = true)
