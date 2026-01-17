@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
@@ -134,8 +133,11 @@ public class ProjectService implements ProjectServiceInterface {
 
         checkProjectMembership(username, project);
 
-        for (User user : new ArrayList<>(project.getUsers())) {
-            user.getProjects().remove(project);
+        if (project.getUsers() != null) {
+            for (User user : new ArrayList<>(project.getUsers())) {
+                user.getProjects().remove(project);
+            }
+            project.getUsers().clear();
         }
 
         projectRepository.delete(project);
