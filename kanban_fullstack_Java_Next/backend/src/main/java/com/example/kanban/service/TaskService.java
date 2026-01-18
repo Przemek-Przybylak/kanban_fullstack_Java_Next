@@ -20,7 +20,7 @@ import java.util.List;
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
-public final class TaskService implements TaskServiceInterface {
+public class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 

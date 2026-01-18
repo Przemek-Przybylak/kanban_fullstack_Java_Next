@@ -20,7 +20,7 @@ import java.util.Objects;
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
-public final class ProjectService implements ProjectServiceInterface {
+public class ProjectService implements ProjectServiceInterface {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
