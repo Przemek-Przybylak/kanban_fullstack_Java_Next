@@ -25,7 +25,7 @@ export default function ProjectPage() {
         {type === "addProject" && <AddProjectModal />}
         {type === "addTask" && <TaskFormModal />}
         {type === "editTask" && <TaskFormModal />}
-        {tasks && <Dashboard tasks={tasks} />}
+        {tasks && <Dashboard />}
       </StatusWrapper>
     </>
   );
