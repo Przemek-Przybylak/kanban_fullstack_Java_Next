@@ -38,6 +38,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ loading: false });
     }
   },
+
   fetchTask: async (taskId: string) => {
     set({ loading: true, error: null });
     try {
@@ -49,18 +50,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ loading: false });
     }
   },
-  addTask: async (addedTask: PostTask) => {
-    set({ loading: true, error: null });
-    try {
-      const task = await postTask(addedTask);
-      set((state) => ({ tasks: [...state.tasks, task] }));
-      console.log("Odpowiedź z backendu:", task);
-    } catch (error) {
-      set({ error: (error as Error).message });
-    } finally {
-      set({ loading: false });
-    }
-  },
+
   deleteTask: async (taskId: string) => {
     set({ loading: true, error: null });
     try {
@@ -74,10 +64,22 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ loading: false });
     }
   },
+
+  addTask: async (addedTask: PostTask) => {
+    set({ loading: true, error: null });
+    try {
+      const task = await postTask(addedTask);
+      set((state) => ({ tasks: [...state.tasks, task] }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   editTask: async (taskId: string, newData: Partial<Task>) => {
     set({ loading: true, error: null });
     try {
-      // Find the existing task to merge with newData
       const existingTask = get().tasks.find((task) => task.id === taskId);
       if (!existingTask) throw new Error("Task not found");
       const updatedTask = await putTask(taskId, {
@@ -86,7 +88,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       });
       set((state) => ({
         tasks: state.tasks.map((task) =>
-          task.id === taskId ? updatedTask : task
+          task.id === taskId ? updatedTask : task,
         ),
       }));
     } catch (error) {
