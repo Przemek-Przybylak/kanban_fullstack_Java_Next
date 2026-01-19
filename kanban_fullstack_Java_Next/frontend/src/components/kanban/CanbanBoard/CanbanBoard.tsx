@@ -2,6 +2,7 @@ import React from "react";
 import { Column } from "../../../types/columns";
 import { Task } from "../../../types/task";
 import CanbanColumn from "../CanbanColumn/CanbanColumn";
+import {useTasksStore} from "../../../stores/useTasksStore";
 
 const statusColumn: Column[] = [
   { colId: 1, colTitle: "To Do", value: "todo" },
@@ -10,7 +11,9 @@ const statusColumn: Column[] = [
   { colId: 4, colTitle: "Done", value: "done" },
 ];
 
-export default function CanbanBoard({ tasks }: { tasks: Task[] }) {
+export default function CanbanBoard() {
+const {tasks} = useTasksStore();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto p-1 lg:p-0">
       {statusColumn.map((column) => {
