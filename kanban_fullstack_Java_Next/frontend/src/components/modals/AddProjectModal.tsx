@@ -6,21 +6,17 @@ import { ModalWrapper } from "./ModalsWrapper";
 import { useModalStore } from "../../stores/useModalStore";
 import { useProjectsStore } from "../../stores/useProjectsStore";
 import Input from "../Input/Input";
-import { Project } from "../../types/projects";
+import CreateProjectRequestDTO, { Project } from "../../types/projects";
 
 export const AddProjectModal = () => {
-  const [newProject, setNewProject] = useState<Project>({} as Project);
+  const [newProject, setNewProject] = useState<CreateProjectRequestDTO>({
+    title: "",
+    description: "",
+  });
   const { type, closeModal } = useModalStore();
   const { sendProject } = useProjectsStore();
 
   if (type !== "addProject") return null;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewProject({
-      ...newProject,
-      title: e.target.value,
-    });
-  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,10 +32,25 @@ export const AddProjectModal = () => {
           label="Project title"
           type="text"
           value={newProject.title}
-          onChange={handleChange}
+          onChange={(e) =>
+            setNewProject({ ...newProject, title: e.target.value })
+          }
           required={true}
           placeholder="Enter project title"
         />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            rows={3}
+            value={newProject.description}
+            onChange={(e) =>
+              setNewProject({ ...newProject, description: e.target.value })
+            }
+          />
+        </div>
         <button
           className="border-[1px] border-gray-800 rounded p-2 hover:opacity-70"
           type="submit"
