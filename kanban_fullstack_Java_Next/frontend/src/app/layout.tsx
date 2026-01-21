@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SideBar from "../components/SideBar/SideBar";
 import React from "react";
+import AuthWrapper from "../components/Auth/AuthWrapper/AuthWrapper";
 
 const Inter = {
   fontFamily: "Inter, sans-serif",
@@ -24,10 +25,7 @@ export default function RootLayout({
       >
         <SideBar />
         <main className="flex-1 overflow-y-auto">{children}</main>
-        <div className="fixed top-4 right-4 flex gap-4 z-50">
-          <p className="cursor-pointer">login</p>
-          <p className="cursor-pointer">register</p>
-        </div>
+        <AuthWrapper />
       </body>
     </html>
   );
