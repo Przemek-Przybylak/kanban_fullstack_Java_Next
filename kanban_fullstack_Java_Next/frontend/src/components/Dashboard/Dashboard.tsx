@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import TaskModal from "../../components/modals/TaskModal";
 import { useModalStore } from "../../stores/useModalStore";
 import { useProjectsStore } from "../../stores/useProjectsStore";
-import { Task } from "../../types/task";
 import CanbanBoard from "../kanban/CanbanBoard/CanbanBoard";
 import { useParams } from "next/navigation";
 
