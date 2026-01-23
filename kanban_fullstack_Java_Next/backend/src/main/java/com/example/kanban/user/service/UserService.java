@@ -8,6 +8,7 @@ import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -84,5 +86,22 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id for " + username + " not found"));
     }
 
+    public UserResponseDto me(HttpServletRequest request) {
+        String token = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("token"))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
+        String username = jwtUtil.getUsernameFromToken(token);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        return new UserResponseDto(
+                user.getId(),
+                user.getRole(),
+                user.getUsername()
+        );
+    }
 }
