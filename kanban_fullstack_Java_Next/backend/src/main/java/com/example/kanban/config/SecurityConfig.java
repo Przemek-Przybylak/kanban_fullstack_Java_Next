@@ -31,7 +31,7 @@ public class SecurityConfig {
                     corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:3000"));
                     corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
-                    corsConfiguration.setAllowCredentials(true); // <--- DODAJ TO (Ważne dla Next.js)
+                    corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
