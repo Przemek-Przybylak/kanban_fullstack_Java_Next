@@ -4,6 +4,7 @@ import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,10 @@ public class AuthController {
         return ResponseEntity.ok(
                 userService.login(requestDto, response)
         );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> me(HttpServletRequest request) {
+        return ResponseEntity.ok(userService.me(request));
     }
 }
