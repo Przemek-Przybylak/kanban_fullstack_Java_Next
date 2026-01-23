@@ -32,7 +32,7 @@ public class Project implements HasId {
 
     private String title;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("project")
     private List<Task> tasks = new ArrayList<>();
 
