@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/projects")
 public class ProjectController {
     private final ProjectService projectService;
@@ -23,9 +24,9 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/tasks")
-    public ResponseEntity<List<TaskResponseDto>> getTaskByProject(@PathVariable String projectId) {
+    public ResponseEntity<List<TaskResponseDto>> getTasksByProject(@PathVariable String projectId) {
 
-        return ResponseEntity.ok(projectService.getTaskByProject(projectId));
+        return ResponseEntity.ok(projectService.getTasksByProject(projectId));
     }
 
     @PostMapping("/{projectId}/tasks")
