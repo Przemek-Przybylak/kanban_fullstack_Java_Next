@@ -3,107 +3,135 @@ import CreateProjectRequestDTO, { Project } from "../types/projects";
 import { Task } from "../types/task";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN = process.env.NEXT_PUBLIC_DEV_TOKEN;
 
-// Pomocnicze nagłówki z tokenem
-const HEADERS = {
+const JSON_HEADERS = {
   "Content-Type": "application/json",
-  Authorization: `Bearer ${TOKEN}`,
 };
+
+// -------- PROJECTS --------
 
 export async function fetchProjectsFromApi() {
-  const response = await fetch(`${BASE_URL}/projects`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+  const res = await fetch(`${BASE_URL}/projects`, {
+    credentials: "include",
   });
-  if (!response.ok) throw new Error("Failed to fetch projects");
-  return response.json();
+  if (!res.ok) throw new Error("Failed to fetch projects");
+  return res.json();
 }
 
-export const fetchProjectFromApi = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/projects/${id}`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+export async function fetchProjectFromApi(id: string) {
+  const res = await fetch(`${BASE_URL}/projects/${id}`, {
+    credentials: "include",
   });
-  if (!response.ok) throw new Error("Failed to fetch project");
-  return response.json();
-};
+  if (!res.ok) throw new Error("Failed to fetch project");
+  return res.json();
+}
 
-export const postProject = async (project: CreateProjectRequestDTO) => {
-  const response = await fetch(`${BASE_URL}/projects`, {
+export async function postProject(project: CreateProjectRequestDTO) {
+  const res = await fetch(`${BASE_URL}/projects`, {
     method: "POST",
-    headers: HEADERS,
+    headers: JSON_HEADERS,
+    credentials: "include",
     body: JSON.stringify(project),
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Błąd z backendu:", errorData);
-    throw new Error("Failed to add project");
-  }
-  return response.json();
-};
+  if (!res.ok) throw new Error("Failed to add project");
+  return res.json();
+}
 
-export const putProject = async (id: string, project: Project) => {
-  const response = await fetch(`${BASE_URL}/projects/${id}`, {
+export async function putProject(id: string, project: Project) {
+  const res = await fetch(`${BASE_URL}/projects/${id}`, {
     method: "PUT",
-    headers: HEADERS,
+    headers: JSON_HEADERS,
+    credentials: "include",
     body: JSON.stringify(project),
   });
-  if (!response.ok) throw new Error(`Failed to edit project with id ${id}`);
-  return response.json();
-};
+  if (!res.ok) throw new Error(`Failed to edit project ${id}`);
+  return res.json();
+}
 
-export const deleteProjectFromApi = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/projects/${id}`, {
+export async function deleteProjectFromApi(id: string) {
+  const res = await fetch(`${BASE_URL}/projects/${id}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${TOKEN}` },
+    credentials: "include",
   });
-  if (!response.ok) throw new Error(`Failed to delete project with id ${id}`);
-  return response.status === 204;
-};
+  if (!res.ok) throw new Error(`Failed to delete project ${id}`);
+  return true;
+}
+
+// -------- TASKS --------
 
 export async function fetchTasksByProjectId(projectId: string) {
-  const response = await fetch(`${BASE_URL}/projects/${projectId}/tasks`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+  const res = await fetch(`${BASE_URL}/projects/${projectId}/tasks`, {
+    credentials: "include",
   });
-  if (!response.ok) throw new Error("Failed to fetch tasks");
-  return response.json();
+  if (!res.ok) throw new Error("Failed to fetch tasks");
+  return res.json();
 }
 
 export async function fetchTask(taskId: string) {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+  const res = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+    credentials: "include",
   });
-  if (!response.ok) throw new Error("Failed to fetch task");
-  return response.json();
+  if (!res.ok) throw new Error("Failed to fetch task");
+  return res.json();
 }
 
-export async function postTask(addedTask: PostTask) {
-  const response = await fetch(
-    `${BASE_URL}/projects/${addedTask.projectId}/tasks`,
-    {
-      method: "POST",
-      headers: HEADERS,
-      body: JSON.stringify(addedTask),
-    }
-  );
-  if (!response.ok) throw new Error("Failed to add task");
-  return response.json();
-}
-
-export async function deleteTaskFromApi(id: string) {
-  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${TOKEN}` },
+export async function postTask(task: PostTask) {
+  const res = await fetch(`${BASE_URL}/projects/${task.projectId}/tasks`, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    credentials: "include",
+    body: JSON.stringify(task),
   });
-  if (!response.ok) throw new Error(`Failed to delete task with id ${id}`);
-  return response.status === 204;
+  if (!res.ok) throw new Error("Failed to add task");
+  return res.json();
 }
 
 export async function putTask(taskId: string, newData: Task) {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
+  const res = await fetch(`${BASE_URL}/tasks/${taskId}`, {
     method: "PUT",
-    headers: HEADERS,
+    headers: JSON_HEADERS,
+    credentials: "include",
     body: JSON.stringify(newData),
   });
-  if (!response.ok) throw new Error(`Failed to edit task with id ${taskId}`);
-  return response.json();
+  if (!res.ok) throw new Error(`Failed to edit task ${taskId}`);
+  return res.json();
+}
+
+export async function deleteTaskFromApi(id: string) {
+  const res = await fetch(`${BASE_URL}/tasks/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`Failed to delete task ${id}`);
+  return true;
+}
+
+// -------- AUTH --------
+
+export async function loginUser(username: string, password: string) {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    credentials: "include",
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!res.ok) throw new Error("Login failed");
+
+  return res.json();
+}
+
+export async function fetchMe() {
+  const res = await fetch(`${BASE_URL}/auth/me`, {
+    credentials: "include",
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function logoutUser() {
+  await fetch(`${BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 }
