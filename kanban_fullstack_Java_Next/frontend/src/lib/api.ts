@@ -82,7 +82,14 @@ export async function postTask(task: PostTask) {
     credentials: "include",
     body: JSON.stringify(task),
   });
-  if (!res.ok) throw new Error("Failed to add task");
+   if (!res.ok) {
+      let errorMessage = "Task not added";
+      try {
+        const data = await res.json();
+        if (data?.message) errorMessage = data.message;
+      } catch {}
+      throw new Error(errorMessage);
+    }
   return res.json();
 }
 
@@ -117,6 +124,22 @@ export async function loginUser(username: string, password: string) {
   });
 
   if (!res.ok) throw new Error("Login failed");
+
+  return res.json();
+}
+
+export async function registerUser(username: string, password: string) {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: "Unknown error" }));
+    throw new Error(err.message || "Registration failed");
+  }
 
   return res.json();
 }
