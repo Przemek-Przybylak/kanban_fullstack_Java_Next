@@ -8,7 +8,6 @@ import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -161,7 +160,10 @@ public class ProjectService implements ProjectServiceInterface {
                 .anyMatch(user -> Objects.equals(user.getId(), ownerId));
 
         if (!isMember) {
-            throw new AccessDeniedException("You don't have access for this project");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You don't have access for this project"
+            );
         }
     }
 }
