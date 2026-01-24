@@ -20,6 +20,12 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtCookieFilter jwtCookieFilter;
+
+    public SecurityConfig(JwtCookieFilter jwtCookieFilter) {
+        this.jwtCookieFilter = jwtCookieFilter;
+    }
+
     @Value("${app.jwt.secret}")
     public String SECRET;
 
@@ -43,6 +49,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())));
+
+        http.addFilterBefore(jwtCookieFilter,
+                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
