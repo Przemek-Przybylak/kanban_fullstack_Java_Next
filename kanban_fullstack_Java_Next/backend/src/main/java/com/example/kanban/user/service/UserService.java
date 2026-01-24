@@ -28,7 +28,7 @@ public class UserService {
     }
 
     @Transactional
-    public User register(final RegisterRequestDto requestDto) {
+    public UserResponseDto register(final RegisterRequestDto requestDto) {
         Optional<User> isUsernameUse = userRepository.findByUsername(requestDto.
                 username());
         if (isUsernameUse.isPresent()) {
@@ -40,7 +40,9 @@ public class UserService {
         user.setUsername(requestDto.username());
         user.setPassword(passwordEncoder.encode(requestDto.password()));
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return new UserResponseDto(user.getId(), user.getRole(), user.getUsername());
     }
 
     public String loginAndReturnToken(final LoginRequestDto requestDto) {
