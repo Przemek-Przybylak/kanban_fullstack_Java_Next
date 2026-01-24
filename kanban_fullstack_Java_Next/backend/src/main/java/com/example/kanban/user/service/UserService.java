@@ -7,16 +7,12 @@ import com.example.kanban.user.model.Role;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.util.JwtUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -47,7 +43,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserResponseDto login(final LoginRequestDto requestDto, HttpServletResponse response) {
+    public String loginAndReturnToken(final LoginRequestDto requestDto) {
         final var user = userRepository.findByUsername(requestDto.username())
                 .orElseThrow(
                         () -> new ResponseStatusException(
@@ -60,17 +56,9 @@ public class UserService {
             );
         }
 
-        final String token = jwtUtil.generateToken(user.getUsername());
-
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // prod
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60); // 1h
-        response.addCookie(cookie);
-
-        return new UserResponseDto(user.getId(), user.getRole(), user.getUsername());
+        return jwtUtil.generateToken(user.getUsername());
     }
+
 
     @Transactional
     public User getUserById(String id) {
@@ -86,13 +74,7 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id for " + username + " not found"));
     }
 
-    public UserResponseDto me(HttpServletRequest request) {
-        String token = Arrays.stream(request.getCookies())
-                .filter(c -> c.getName().equals("token"))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-
+    public UserResponseDto getMeFromToken(String token) {
         String username = jwtUtil.getUsernameFromToken(token);
 
         User user = userRepository.findByUsername(username)
