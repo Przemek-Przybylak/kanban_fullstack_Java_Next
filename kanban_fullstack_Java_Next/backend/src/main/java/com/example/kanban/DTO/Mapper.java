@@ -55,6 +55,11 @@ public class Mapper {
             );
         }
 
+        String username = null;
+        if (entity.getUser() != null) {
+            username = entity.getUser().getUsername();
+        }
+
         return new TaskResponseDto(
                 entity.getId(),
                 entity.getTitle(),
@@ -63,7 +68,8 @@ public class Mapper {
                 entity.getApprovedBy(),
                 entity.getDueDate(),
                 entity.getCreatedAt(),
-                projectDto
+                projectDto,
+                username
         );
     }
 
