@@ -7,7 +7,7 @@ export default function AuthWrapper() {
       <Link href="/auth/login" className="hover:underline">
         Login
       </Link>
-      <Link href="/register" className="hover:underline">
+      <Link href="/auth/register" className="hover:underline">
         Register
       </Link>
     </div>
