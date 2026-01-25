@@ -8,6 +8,13 @@ const JSON_HEADERS = {
   "Content-Type": "application/json",
 };
 
+function checkPermission(res: Response) {
+  if (res.status === 403) {
+    throw new Error("FORBIDDEN");
+  }
+  if (!res.ok) throw new Error(`DELETE_FAILED`);
+}
+
 // -------- PROJECTS --------
 
 export async function fetchProjectsFromApi() {
@@ -33,7 +40,7 @@ export async function postProject(project: CreateProjectRequestDTO) {
     credentials: "include",
     body: JSON.stringify(project),
   });
-  if (!res.ok) throw new Error("Failed to add project");
+  checkPermission(res);
   return res.json();
 }
 
@@ -44,7 +51,7 @@ export async function putProject(id: string, project: Project) {
     credentials: "include",
     body: JSON.stringify(project),
   });
-  if (!res.ok) throw new Error(`Failed to edit project ${id}`);
+  checkPermission(res);
   return res.json();
 }
 
@@ -53,7 +60,9 @@ export async function deleteProjectFromApi(id: string) {
     method: "DELETE",
     credentials: "include",
   });
-  if (!res.ok) throw new Error(`Failed to delete project ${id}`);
+
+  checkPermission(res);
+
   return true;
 }
 
@@ -82,14 +91,15 @@ export async function postTask(task: PostTask) {
     credentials: "include",
     body: JSON.stringify(task),
   });
-   if (!res.ok) {
-      let errorMessage = "Task not added";
-      try {
-        const data = await res.json();
-        if (data?.message) errorMessage = data.message;
-      } catch {}
-      throw new Error(errorMessage);
-    }
+  if (!res.ok) {
+    let errorMessage = "Task not added";
+    try {
+      const data = await res.json();
+      if (data?.message) errorMessage = data.message;
+    } catch {}
+    throw new Error(errorMessage);
+  }
+  checkPermission(res);
   return res.json();
 }
 
@@ -100,7 +110,7 @@ export async function putTask(taskId: string, newData: Task) {
     credentials: "include",
     body: JSON.stringify(newData),
   });
-  if (!res.ok) throw new Error(`Failed to edit task ${taskId}`);
+  checkPermission(res);
   return res.json();
 }
 
@@ -109,7 +119,7 @@ export async function deleteTaskFromApi(id: string) {
     method: "DELETE",
     credentials: "include",
   });
-  if (!res.ok) throw new Error(`Failed to delete task ${id}`);
+  checkPermission(res);
   return true;
 }
 
