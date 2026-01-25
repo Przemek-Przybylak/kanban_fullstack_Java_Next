@@ -62,9 +62,9 @@ export default function SideBar() {
                   {project.title}
                 </Link>
                 <Button
-                  onClick={() => deleteProject(project.id)}
+                  requireAuth
                   variant="danger"
-                  className="w-full h-[40px] flex items-center justify-center"
+                  onClick={() => deleteProject(project.id)}
                 >
                   Remove
                 </Button>
