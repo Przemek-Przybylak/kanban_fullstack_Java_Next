@@ -5,8 +5,10 @@ import React from "react";
 import { useState } from "react";
 import { loginUser, registerUser } from "../../../lib/api";
 import { useAuthStore } from "../../../stores/useAuthStore";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,6 +21,7 @@ export default function RegisterPage() {
       setPassword("");
       const user = await loginUser(username, password);
       useAuthStore.getState().setUser(user);
+      router.push("/");
     } catch (err: any) {
       alert(`Registration error: ${err.message}`);
     }

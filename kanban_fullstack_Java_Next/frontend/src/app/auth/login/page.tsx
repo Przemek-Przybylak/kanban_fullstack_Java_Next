@@ -5,8 +5,10 @@ import React from "react";
 import { useState } from "react";
 import { useAuthStore } from "../../../stores/useAuthStore";
 import { loginUser } from "../../../lib/api";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,6 +20,7 @@ export default function LoginPage() {
     try {
       const user = await loginUser(username, password);
       useAuthStore.getState().setUser(user);
+      router.push("/");
     } catch (err) {
       console.error("Login failed", err);
     }
