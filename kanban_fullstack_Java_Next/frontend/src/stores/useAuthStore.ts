@@ -6,13 +6,13 @@ type User = {
   username: string;
 };
 
-type AuthState = {
-    user: User | null;
-    isLoggedIn: boolean;
+type AuthStore = {
+  user: User | null;
+  isLoggedIn: boolean;
 
-    setUser: (user: User) => void;
-    logout: () => void;
-    }
+  setUser: (user: User) => void;
+  logout: () => void;
+};
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
