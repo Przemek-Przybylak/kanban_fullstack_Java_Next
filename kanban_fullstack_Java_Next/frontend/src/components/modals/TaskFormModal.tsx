@@ -9,6 +9,7 @@ import Input from "../Input/Input";
 import { Task } from "../../types/task";
 import { useParams } from "next/navigation";
 import { PostTask } from "../../types/postTask";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 const getInitialTaskData = (projectId: string): Task => ({
   id: "",
@@ -23,6 +24,7 @@ const getInitialTaskData = (projectId: string): Task => ({
 });
 
 export default function TaskFormModal() {
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const projectId = useParams().id as string;
   const { type, isOpen, closeModal, data } = useModalStore();
   const { addTask, editTask } = useTasksStore();
@@ -45,6 +47,11 @@ export default function TaskFormModal() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isLoggedIn) {
+      alert("Must be logged in to perform this action");
+      return;
+    }
 
     const taskToPost: PostTask = {
       title: taskData.title,
