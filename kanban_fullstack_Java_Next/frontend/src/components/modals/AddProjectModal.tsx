@@ -7,8 +7,10 @@ import { useModalStore } from "../../stores/useModalStore";
 import { useProjectsStore } from "../../stores/useProjectsStore";
 import Input from "../Input/Input";
 import CreateProjectRequestDTO, { Project } from "../../types/projects";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 export const AddProjectModal = () => {
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [newProject, setNewProject] = useState<CreateProjectRequestDTO>({
     title: "",
     description: "",
@@ -20,6 +22,12 @@ export const AddProjectModal = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isLoggedIn) {
+      alert("Must be logged in to add a project");
+      return;
+    }
+
     sendProject(newProject);
     closeModal();
   };
