@@ -13,26 +13,17 @@ export default function TaskModal() {
 
   if (type !== "task") return null;
   const task = data as Task;
-  const {
-    id,
-    title,
-    description,
-    status,
-    approvedBy,
-    dueDate,
-    createdAt,
-    project,
-  } = task;
+  const { id, title, description, status, dueDate, project } = task;
 
   return (
     <ModalWrapper isOpen={!!data} onClose={closeModal}>
       <h2 className="text-2xl font-bold mb-4 text-gray-800">{title}</h2>
       <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-6">
         <span>
-          Projekt: <strong className="text-gray-700">{project.title}</strong>
+          Project: <strong className="text-gray-700">{project.title}</strong>
         </span>
         <span>
-          Termin: <strong className="text-gray-700">{dueDate}</strong>
+          Due date: <strong className="text-gray-700">{dueDate}</strong>
         </span>
         <span>
           Status: <StatusBadge status={status} />
@@ -42,6 +33,7 @@ export default function TaskModal() {
         <p>{description}</p>
       </div>
       <Button
+        requireAuth
         onClick={() => {
           deleteTask(id);
           closeModal();
@@ -50,7 +42,11 @@ export default function TaskModal() {
       >
         Delete Task
       </Button>
-      <Button onClick={() => openModal("editTask", task)} className="ml-2">
+      <Button
+        requireAuth
+        onClick={() => openModal("editTask", task)}
+        className="ml-2"
+      >
         Edit Task
       </Button>
     </ModalWrapper>
