@@ -26,10 +26,10 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody RegisterRequestDto request) {
-        userService.register(request);
+    public UserResponseDto register(@RequestBody RegisterRequestDto requestDto) {
+       return userService.register(requestDto);
     }
 
     @PostMapping("/login")
