@@ -72,14 +72,26 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
   },
   deleteProject: async (id: string) => {
     set({ loading: true, error: null });
+
     try {
       await deleteProjectFromApi(id);
       set((state) => ({
         projects: state.projects.filter((p) => p.id !== id),
         loading: false,
       }));
-    } catch (error) {
-      set({ error: (error as Error).message, loading: false });
+    } catch (error: any) {
+      if (error.message === "FORBIDDEN") {
+        set({
+          error: "You dont have permission to delete this project",
+          loading: false,
+        });
+        return;
+      }
+
+      set({
+        error: "An error occurred while deleting the project",
+        loading: false,
+      });
     }
   },
 }));
