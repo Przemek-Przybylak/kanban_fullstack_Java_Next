@@ -3,6 +3,7 @@ import "./globals.css";
 import SideBar from "../components/SideBar/SideBar";
 import React from "react";
 import AuthWrapper from "../components/Auth/AuthWrapper/AuthWrapper";
+import ModalProvider from "../components/modals/ModalProvider";
 
 const Inter = {
   fontFamily: "Inter, sans-serif",
@@ -20,13 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${Inter} h-screen bg-gray-50 text-gray-900 font-sans flex flex-col lg:flex-row overflow-hidden`}
-      >
-        <SideBar />
-        <main className="flex-1 overflow-y-auto">{children}</main>
-        <AuthWrapper />
-      </body>
+      <ModalProvider>
+        <body
+          className={`${Inter} h-screen bg-gray-50 text-gray-900 font-sans flex flex-col lg:flex-row overflow-hidden`}
+        >
+          <SideBar />
+          <main className="flex-1 overflow-y-auto">{children}</main>
+          <AuthWrapper />
+        </body>
+      </ModalProvider>
     </html>
   );
 }
