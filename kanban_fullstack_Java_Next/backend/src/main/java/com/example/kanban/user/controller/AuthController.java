@@ -33,21 +33,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public UserResponseDto login(
-            @RequestBody LoginRequestDto requestDto,
-            HttpServletResponse response
-    ) {
+    public UserResponseDto login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
         String token = userService.loginAndReturnToken(requestDto);
 
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(60*60);
-        response.addCookie(cookie);
+        // Zamiast zwykłego addCookie, użyj ResponseCookie (Springowy helper)
+        org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(false) // false dla http://localhost
+                .path("/")
+                .maxAge(60 * 60)
+                .sameSite("Lax") // Pozwala na przesyłanie ciacha przy nawigacji
+                .build();
 
-        final var user = userRepository.findByUsername(requestDto.username())
-                .orElseThrow();
+        response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
+
+        final var user = userRepository.findByUsername(requestDto.username()).orElseThrow();
         return new UserResponseDto(user.getId(), user.getRole(), user.getUsername());
     }
 
