@@ -56,7 +56,6 @@ public class JwtCookieFilter extends OncePerRequestFilter {
                                 SecurityContextHolder.getContext().setAuthentication(auth);
                             }
                         } catch (Exception ignored) {
-                            // token niepoprawny → nie ustawiamy auth
                         }
                     });
         }
