@@ -21,6 +21,7 @@ com\example\kanban\user\controller\AuthController.class
 com\example\kanban\controller\ProjectController.class
 com\example\kanban\config\SecurityConfig.class
 com\example\kanban\user\model\Role.class
+com\example\kanban\config\JwtCookieFilter.class
 com\example\kanban\validation\OnCreate.class
 com\example\kanban\user\model\User.class
 com\example\kanban\util\UpdateIfNotNull.class
@@ -34,4 +35,5 @@ com\example\kanban\DTO\shortTasksDto.class
 com\example\kanban\DTO\TaskRequestDto.class
 com\example\kanban\DTO\ProjectPatchRequestDto.class
 com\example\kanban\user\dto\UserResponseDto.class
+com\example\kanban\config\DataInitializer.class
 com\example\kanban\exception\ValidationErrorResponse.class
