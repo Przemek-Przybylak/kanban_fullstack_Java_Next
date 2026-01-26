@@ -2,6 +2,10 @@ services:
   database:
     image: postgres:15
     container_name: kanban-db-container
+    networks:
+      default:
+        aliases:
+          - postgres
     environment:
       POSTGRES_DB: kanban
       POSTGRES_USER: postgres
