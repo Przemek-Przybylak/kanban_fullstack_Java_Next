@@ -68,7 +68,7 @@ public class ProjectServiceTest {
         when(taskRepository.findByProjectId("p1"))
                 .thenReturn(List.of(task1, task2));
 
-        List<TaskResponseDto> result = projectService.getTaskByProject("p1");
+        List<TaskResponseDto> result = projectService.getTasksByProject("p1");
 
         assertEquals(2, result.size());
     }
