@@ -62,7 +62,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
+    @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getUsers());
