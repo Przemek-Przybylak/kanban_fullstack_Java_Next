@@ -76,6 +76,19 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id for " + username + " not found"));
     }
 
+    @Transactional
+    public void changeUserRole(String userId, Role newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getUsername().equals("admin") && newRole != Role.ADMIN) {
+            throw new RuntimeException("Nie można zmienić roli głównemu administratorowi!");
+        }
+
+        user.setRole(newRole);
+        userRepository.save(user);
+    }
+
     public UserResponseDto getMeFromToken(String token) {
         String username = jwtUtil.getUsernameFromToken(token);
 
