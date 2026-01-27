@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Obsługa pre-flight
                         .requestMatchers("/auth/**", "/auth/login", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/projects/**").permitAll()
+                        .requestMatchers("/users/**/role").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 
