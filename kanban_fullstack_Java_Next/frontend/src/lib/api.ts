@@ -170,32 +170,32 @@ export async function logoutUser() {
 }
 
 export async function getUsers() {
-    const res = await fetch(`${BASE_URL}/auth/users`, {
-        method: "GET",
-        credentials: "include",
-    });
+  const res = await fetch(`http://localhost:8080/auth/users`, {
+    method: "GET",
+    credentials: "include",
+  });
 
-    if (!res.ok) {
-        console.error("Cannot get users");
-        return null;
-    }
-    return res.json();
+  if (!res.ok) {
+    console.error("Cannot get users");
+    return null;
+  }
+  return res.json();
 }
 
-export async function changeRole(userId, newRole) {
-    const res = await fetch(`${BASE_URL}/users/${userId}/role`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role: newRole }),
-    });
+export async function changeRole(userId: string, newRole: string) {
+  const res = await fetch(`${BASE_URL}/auth/${userId}/role`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ role: newRole }),
+  });
 
-    if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Role cannot be change");
-    }
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Role cannot be change");
+  }
 
-    return true;
+  return true;
 }
