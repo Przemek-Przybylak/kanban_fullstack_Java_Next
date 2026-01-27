@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Obsługa pre-flight
                         .requestMatchers("/auth/**", "/auth/login", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/projects/**").permitAll()
-                        .requestMatchers("/users/**/role").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/auth/{userId}/role").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 
@@ -62,7 +62,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of("http://localhost:3000")); // Twoja apka Next.js
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
