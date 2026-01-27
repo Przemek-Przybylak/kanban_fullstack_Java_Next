@@ -8,12 +8,14 @@ import StatusWrapper from "../StatusWrapper/StatusWrapper";
 import Button from "../Button/Button";
 import { useModalStore } from "../../stores/useModalStore";
 import { FiMenu, FiX } from "react-icons/fi";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 export default function SideBar() {
   const { fetchProjects, projects, deleteProject, loading, error } =
     useProjectsStore();
   const { openModal } = useModalStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     fetchProjects();
@@ -28,7 +30,6 @@ export default function SideBar() {
       >
         {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
       </button>
-
       <aside
         className={`
           bg-gray-200 rounded-2xl
@@ -41,6 +42,14 @@ export default function SideBar() {
           overflow-y-auto
         `}
       >
+        {user?.role === "ADMIN" && (
+          <Link
+            href="/users"
+            className="text-red-500 font-bold hover:underline"
+          >
+            Admin panel ⚙️
+          </Link>ó
+        )}
         <h2 className="text-xl font-bold mb-6 text-gray-800">Projects</h2>
         <Button
           onClick={() => openModal("addProject")}
