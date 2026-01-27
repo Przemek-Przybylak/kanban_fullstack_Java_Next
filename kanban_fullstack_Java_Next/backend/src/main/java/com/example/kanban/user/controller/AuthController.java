@@ -3,12 +3,15 @@ package com.example.kanban.user.controller;
 import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
+import com.example.kanban.user.model.RoleUpdateRequest;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,7 +32,7 @@ public class AuthController {
     @PostMapping(value = "/register", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto register(@RequestBody RegisterRequestDto requestDto) {
-       return userService.register(requestDto);
+        return userService.register(requestDto);
     }
 
     @PostMapping("/login")
@@ -49,6 +52,12 @@ public class AuthController {
 
         final var user = userRepository.findByUsername(requestDto.username()).orElseThrow();
         return new UserResponseDto(user.getId(), user.getRole(), user.getUsername());
+    }
+
+    @PatchMapping("/{userId}/role")
+    public ResponseEntity<Void> updateUserRole(@PathVariable String userId, @RequestBody @Valid RoleUpdateRequest roleUpdate) {
+        userService.changeUserRole(userId, roleUpdate.role());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")
