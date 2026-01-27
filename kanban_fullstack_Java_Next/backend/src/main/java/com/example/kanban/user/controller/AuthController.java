@@ -12,10 +12,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,13 +41,13 @@ public class AuthController {
     public UserResponseDto login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
         String token = userService.loginAndReturnToken(requestDto);
 
-        // Zamiast zwykłego addCookie, użyj ResponseCookie (Springowy helper)
+
         org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("token", token)
                 .httpOnly(true)
-                .secure(false) // false dla http://localhost
+                .secure(false)
                 .path("/")
                 .maxAge(60 * 60)
-                .sameSite("Lax") // Pozwala na przesyłanie ciacha przy nawigacji
+                .sameSite("Lax")
                 .build();
 
         response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
@@ -58,6 +60,12 @@ public class AuthController {
     public ResponseEntity<Void> updateUserRole(@PathVariable String userId, @RequestBody @Valid RoleUpdateRequest roleUpdate) {
         userService.changeUserRole(userId, roleUpdate.role());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getUsers());
     }
 
     @GetMapping("/me")
