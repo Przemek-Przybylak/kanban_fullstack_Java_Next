@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -87,6 +88,12 @@ public class UserService {
 
         user.setRole(newRole);
         userRepository.save(user);
+    }
+
+    public List<UserResponseDto> getUsers() {
+
+        return userRepository.findAll().stream().map(user -> new UserResponseDto(user.getId(), user.getRole(), user.getUsername()))
+                .toList();
     }
 
     public UserResponseDto getMeFromToken(String token) {
