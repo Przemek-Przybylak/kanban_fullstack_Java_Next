@@ -48,7 +48,7 @@ export default function SideBar() {
             className="text-red-500 font-bold hover:underline"
           >
             Admin panel ⚙️
-          </Link>ó
+          </Link>
         )}
         <h2 className="text-xl font-bold mb-6 text-gray-800">Projects</h2>
         <Button
