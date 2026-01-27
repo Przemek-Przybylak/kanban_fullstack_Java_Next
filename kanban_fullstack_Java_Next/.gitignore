@@ -1,0 +1,17 @@
+# Foldery narzędziowe i buildy
+node_modules/
+.next/
+target/
+build/
+dist/
+
+# IntelliJ i VS Code (ważne kropki!)
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Systemowe
+.DS_Store
+Thumbs.db
