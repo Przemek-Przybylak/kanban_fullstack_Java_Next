@@ -168,3 +168,34 @@ export async function logoutUser() {
     credentials: "include",
   });
 }
+
+export async function getUsers() {
+    const res = await fetch(`${BASE_URL}/auth/users`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!res.ok) {
+        console.error("Cannot get users");
+        return null;
+    }
+    return res.json();
+}
+
+export async function changeRole(userId, newRole) {
+    const res = await fetch(`${BASE_URL}/users/${userId}/role`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: newRole }),
+    });
+
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Role cannot be change");
+    }
+
+    return true;
+}
