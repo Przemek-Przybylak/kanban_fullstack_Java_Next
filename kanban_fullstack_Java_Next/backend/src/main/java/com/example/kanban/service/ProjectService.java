@@ -8,11 +8,12 @@ import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,9 +46,9 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
         final Project project = getProjectIfExisting(projectId);
-        checkProjectMembership(username, project);
 
         var task = Mapper.fromDto(taskDto);
 
@@ -98,10 +99,9 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editProject(final String id, final ProjectRequestDto projectDto, final String username) {
         var existingProject = getProjectIfExisting(id);
-
-        checkProjectMembership(username, existingProject);
 
         existingProject.setTitle(projectDto.title());
         existingProject.setDescription(projectDto.description());
@@ -113,10 +113,9 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editPartialProject(final String id, final ProjectPatchRequestDto project, final String username) {
         Project existingProject = getProjectIfExisting(id);
-
-        checkProjectMembership(username, existingProject);
 
         updateIfNotNull(project.description(), existingProject::setDescription);
         updateIfNotNull(project.title(), existingProject::setTitle);
@@ -128,15 +127,13 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteProject(final String id, final String username) {
+        System.out.println("Moje role: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         var project = getProjectIfExisting(id);
 
-        checkProjectMembership(username, project);
-
         if (project.getUsers() != null) {
-            for (User user : new ArrayList<>(project.getUsers())) {
-                user.getProjects().remove(project);
-            }
+            project.getUsers().forEach(user -> user.getProjects().remove(project));
             project.getUsers().clear();
         }
 
