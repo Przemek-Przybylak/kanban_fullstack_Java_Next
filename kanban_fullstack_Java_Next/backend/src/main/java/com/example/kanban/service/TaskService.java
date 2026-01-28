@@ -6,11 +6,10 @@ import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
-import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
-import com.example.kanban.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,12 +48,11 @@ public class TaskService implements TaskServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
         final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        checkTaskMembership(username, existingTask);
 
         existingTask.setTitle(taskDto.title());
         existingTask.setDescription(taskDto.description());
@@ -69,10 +67,9 @@ public class TaskService implements TaskServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto editPartialTask(final String id, final TaskPatchRequestDto taskDto, final String username) {
         var existingTask = getTaskIfExisting(id);
-
-        checkTaskMembership(username, existingTask);
 
         updateIfNotNull(taskDto.description(), existingTask::setDescription);
         updateIfNotNull(taskDto.status(), existingTask::setStatus);
@@ -87,11 +84,10 @@ public class TaskService implements TaskServiceInterface {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteTask(final String id, final String username) {
         final var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
-
-        checkTaskMembership(username, task);
 
         taskRepository.delete(task);
     }
@@ -99,14 +95,5 @@ public class TaskService implements TaskServiceInterface {
     private Task getTaskIfExisting(final String id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
-    }
-
-    private void checkTaskMembership(final String username, final Task task) {
-
-        if (task.getUser() != null) {
-            if (!task.getUser().getUsername().equals(username)) {
-                throw new AccessDeniedException("You don't have access to this task");
-            }
-        }
     }
 }
