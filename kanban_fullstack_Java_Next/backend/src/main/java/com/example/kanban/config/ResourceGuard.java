@@ -16,18 +16,18 @@ public class ResourceGuard {
         this.taskRepository = taskRepository;
     }
 
-    public boolean canAccessProject(String projectId) {
+    public boolean canAccessProject(String id) {
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return projectRepository.findById(projectId)
+        return projectRepository.findById(id)
                 .map(p -> p.getUsers().stream()
-                        .anyMatch(u -> u.getUsername().equals(user)))
+                        .anyMatch(u -> u.getUsername().trim().equalsIgnoreCase(user.trim())))
                 .orElse(false);
     }
 
-    public boolean canAccessTask(String taskId) {
+    public boolean canAccessTask(String id) {
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
-        return taskRepository.findById(taskId)
+        return taskRepository.findById(id)
                 .map(t -> t.getUser().getUsername().equals(user))
                 .orElse(false);
     }
