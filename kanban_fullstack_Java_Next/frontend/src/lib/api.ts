@@ -199,3 +199,13 @@ export async function changeRole(userId: string, newRole: string) {
 
   return true;
 }
+
+export async function patchTask(taskId: string, updatedFields: Partial<Task>) {
+  const res = await fetch(`${BASE_URL}/projects/${taskId}/tasks`, {
+    method: "PATCH",
+    headers: JSON_HEADERS,
+    credentials: "include",
+    body: JSON.stringify(updatedFields),
+  });
+  checkPermission(res);
+}
