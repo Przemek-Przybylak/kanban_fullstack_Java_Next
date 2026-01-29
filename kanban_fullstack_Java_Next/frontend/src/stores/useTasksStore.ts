@@ -5,6 +5,7 @@ import {
   postTask,
   putTask,
   deleteTaskFromApi,
+  patchTask,
 } from "../lib/api";
 import { Task } from "../types/task";
 import { PostTask } from "../types/postTask";
@@ -19,6 +20,7 @@ interface TasksStore {
   addTask: (addedTask: PostTask) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   editTask: (taskId: string, newData: Partial<Task>) => Promise<void>;
+  moveTask: (taskId: string, newStatus: string) => Promise<void>;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
@@ -95,6 +97,27 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       set({ error: (error as Error).message });
     } finally {
       set({ loading: false });
+    }
+  },
+
+moveTask: async (taskId: string, newStatus: string) => {
+    const previousTasks = get().tasks;
+
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      ),
+    }));
+
+    try {
+      await patchTask(taskId, { status: newStatus });
+
+    } catch (error) {
+      set({
+        tasks: previousTasks,
+        error: "Failed to move task. Reverting..."
+      });
+      console.error(error);
     }
   },
 }));
