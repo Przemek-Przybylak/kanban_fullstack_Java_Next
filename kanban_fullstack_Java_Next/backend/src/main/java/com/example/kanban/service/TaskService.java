@@ -1,14 +1,11 @@
 package com.example.kanban.service;
 
-import com.example.kanban.DTO.Mapper;
-import com.example.kanban.DTO.TaskPatchRequestDto;
-import com.example.kanban.DTO.TaskRequestDto;
-import com.example.kanban.DTO.TaskResponseDto;
+import com.example.kanban.DTO.*;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +87,18 @@ public class TaskService implements TaskServiceInterface {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         taskRepository.delete(task);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#taskId)")
+    @Override
+    public void updateStatus(String taskId, String newStatus) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+        task.setStatus(newStatus);
+
+        taskRepository.save(task);
     }
 
     private Task getTaskIfExisting(final String id) {
