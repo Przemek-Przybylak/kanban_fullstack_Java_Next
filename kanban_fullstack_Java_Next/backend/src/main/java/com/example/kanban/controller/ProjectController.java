@@ -2,6 +2,7 @@ package com.example.kanban.controller;
 
 import com.example.kanban.DTO.*;
 import com.example.kanban.service.ProjectService;
+import com.example.kanban.service.TaskService;
 import com.example.kanban.util.LocationUtil;
 import com.example.kanban.validation.OnCreate;
 import com.example.kanban.validation.OnUpdate;
@@ -18,9 +19,11 @@ import java.util.List;
 @RequestMapping("/projects")
 public class ProjectController {
     private final ProjectService projectService;
+    private final TaskService taskService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService, TaskService taskService) {
         this.projectService = projectService;
+        this.taskService = taskService;
     }
 
     @GetMapping("/{projectId}/tasks")
@@ -36,6 +39,14 @@ public class ProjectController {
         URI location = LocationUtil.buildLocation(taskResponseDto.id());
 
         return ResponseEntity.created(location).body(taskResponseDto);
+    }
+
+    @PatchMapping("/{taskId}/tasks")
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable String taskId, @RequestBody TaskStatusRequest request, Authentication authentication) {
+
+        taskService.updateStatus(taskId, request.status());
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
