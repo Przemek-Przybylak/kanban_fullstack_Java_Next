@@ -10,6 +10,7 @@ import { Task } from "../../types/task";
 import { useParams } from "next/navigation";
 import { PostTask } from "../../types/postTask";
 import { useAuthStore } from "../../stores/useAuthStore";
+import { validateRequired } from "../../utils/validators";
 
 const getInitialTaskData = (projectId: string): Task => ({
   id: "",
@@ -28,8 +29,25 @@ export default function TaskFormModal() {
   const projectId = useParams().id as string;
   const { type, isOpen, closeModal, data } = useModalStore();
   const { addTask, editTask } = useTasksStore();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [taskData, setTaskData] = useState<Task>(getInitialTaskData(projectId));
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    const titleError = validateRequired(taskData.title);
+    if (titleError) newErrors.title = titleError;
+
+    const descriptionError = validateRequired(taskData.description, 10);
+    if (descriptionError) newErrors.description = descriptionError;
+
+    const usernameError = validateRequired(taskData.username);
+    if (usernameError) newErrors.username = usernameError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -63,16 +81,20 @@ export default function TaskFormModal() {
       projectId: projectId,
     };
 
-    try {
-      if (type === "addTask") {
-        await addTask(taskToPost);
-      } else if (type === "editTask" && data) {
-        await editTask(data.id, taskData);
-      }
+    if (validate()) {
+      try {
+        if (type === "addTask") {
+          await addTask(taskToPost);
+        } else if (type === "editTask" && data) {
+          await editTask(data.id, taskData);
+        }
 
-      closeModal();
-    } catch (error) {
-      console.error("Error saving task:", error);
+        closeModal();
+      } catch (error) {
+        console.error("Error saving task:", error);
+      }
+    } else {
+      console.log("Validation errors:", errors);
     }
   };
 
@@ -87,30 +109,29 @@ export default function TaskFormModal() {
             label="Task title"
             type="text"
             value={taskData.title}
+            error={errors.title}
+            multiline={false}
             onChange={(e) =>
               setTaskData({ ...taskData, title: e.target.value })
             }
-            required
           />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows={3}
-              value={taskData.description}
-              onChange={(e) =>
-                setTaskData({ ...taskData, description: e.target.value })
-              }
-            />
-          </div>
+          <Input
+            label="Description"
+            multiline={true}
+            value={taskData.description}
+            error={errors.description}
+            onChange={(e) => {
+              setTaskData({ ...taskData, description: e.target.value });
+              if (errors.description) setErrors({ ...errors, description: "" });
+            }}
+          />
 
           <Input
             label="Due Date"
             type="date"
             value={taskData.dueDate}
+            multiline={false}
             onChange={(e) =>
               setTaskData({ ...taskData, dueDate: e.target.value })
             }
@@ -137,16 +158,16 @@ export default function TaskFormModal() {
             </select>
           </div>
 
-          <div className="flex gap-2 items-end ">
-            <Input
-              label="Assignee"
-              type="text"
-              value={taskData.username || ""}
-              onChange={(e) =>
-                setTaskData({ ...taskData, username: e.target.value })
-              }
-            />
-          </div>
+          <Input
+            label="Assignee"
+            type="text"
+            value={taskData.username}
+            error={errors.username}
+            multiline={false}
+            onChange={(e) =>
+              setTaskData({ ...taskData, username: e.target.value })
+            }
+          />
 
           {taskData.username && (
             <div className="bg-gray-50 p-3 rounded-md">
@@ -165,6 +186,7 @@ export default function TaskFormModal() {
             label="Approved By"
             type="text"
             value={taskData.approvedBy}
+            multiline={false}
             onChange={(e) =>
               setTaskData({ ...taskData, approvedBy: e.target.value })
             }
