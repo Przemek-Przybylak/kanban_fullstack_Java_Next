@@ -6,7 +6,7 @@ export interface Task {
   approvedBy: string | undefined;
   dueDate?: string;
   createdAt: string;
-  username?: string;
+  username: string;
   project: {
     id: string;
     title: string;
