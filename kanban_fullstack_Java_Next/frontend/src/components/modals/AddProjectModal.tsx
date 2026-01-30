@@ -8,6 +8,7 @@ import { useProjectsStore } from "../../stores/useProjectsStore";
 import Input from "../Input/Input";
 import CreateProjectRequestDTO, { Project } from "../../types/projects";
 import { useAuthStore } from "../../stores/useAuthStore";
+import { validateRequired } from "../../utils/validators";
 
 export const AddProjectModal = () => {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
@@ -17,8 +18,22 @@ export const AddProjectModal = () => {
   });
   const { type, closeModal } = useModalStore();
   const { sendProject } = useProjectsStore();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   if (type !== "addProject") return null;
+
+  const validate = () => {
+      const newErrors: Record<string, string> = {};
+
+      const titleError = validateRequired(newProject.title);
+      if (titleError) newErrors.title = titleError;
+
+      const descError = validateRequired(newProject.description, 10);
+      if (descError) newErrors.description = descError;
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,8 +43,10 @@ export const AddProjectModal = () => {
       return;
     }
 
-    sendProject(newProject);
-    closeModal();
+    if (validate()) {
+      sendProject(newProject);
+      closeModal();
+    }
   };
 
   return (
@@ -40,27 +57,27 @@ export const AddProjectModal = () => {
           label="Project title"
           type="text"
           value={newProject.title}
+          error={errors.title}
           onChange={(e) =>
             setNewProject({ ...newProject, title: e.target.value })
           }
-          required={true}
           placeholder="Enter project title"
         />
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            rows={3}
-            value={newProject.description}
-            onChange={(e) =>
-              setNewProject({ ...newProject, description: e.target.value })
-            }
-          />
-        </div>
+
+        <Input
+          label="Description"
+          multiline={true}
+          rows={3}
+          value={newProject.description}
+          error={errors.description}
+          onChange={(e) =>
+            setNewProject({ ...newProject, description: e.target.value })
+          }
+          placeholder="Enter project description"
+        />
+
         <button
-          className="border-[1px] border-gray-800 rounded p-2 hover:opacity-70"
+          className="mt-4 border-[1px] border-gray-800 rounded p-2 hover:opacity-70"
           type="submit"
         >
           Add
