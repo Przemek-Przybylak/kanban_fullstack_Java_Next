@@ -1,5 +1,7 @@
 package com.example.kanban.user.service;
 
+import com.example.kanban.exception.ConflictException;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
@@ -33,7 +35,7 @@ public class UserService {
         Optional<User> isUsernameUse = userRepository.findByUsername(requestDto.
                 username());
         if (isUsernameUse.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already used");
+            throw new ConflictException("username");
         }
 
         var user = new User();
@@ -49,8 +51,7 @@ public class UserService {
     public String loginAndReturnToken(final LoginRequestDto requestDto) {
         final var user = userRepository.findByUsername(requestDto.username())
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND, "User not found"));
+                        () -> new NotFoundException("user", "username " + requestDto.username()));
 
         if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
             throw new ResponseStatusException(
@@ -67,20 +68,20 @@ public class UserService {
     public User getUserById(String id) {
 
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("user", "id: " + id));
     }
 
     @Transactional
     public String getUserIdFromUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(User::getId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id for " + username + " not found"));
+                .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 
     @Transactional
     public void changeUserRole(String userId, Role newRole) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("user", "id" + userId));
 
         if (user.getUsername().equals("admin") && newRole != Role.ADMIN) {
             throw new RuntimeException("Nie można zmienić roli głównemu administratorowi!");
