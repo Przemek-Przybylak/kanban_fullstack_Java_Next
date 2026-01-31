@@ -1,6 +1,7 @@
 package com.example.kanban.service;
 
 import com.example.kanban.DTO.*;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
@@ -51,8 +52,7 @@ public class ProjectService implements ProjectServiceInterface {
 
         var task = Mapper.fromDto(taskDto);
 
-        final var user = userRepository.findByUsername(taskDto.username())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not exist"));
+        final var user = getOwner(taskDto.username());
 
         task.setUser(user);
         task.setProject(project);
@@ -140,12 +140,12 @@ public class ProjectService implements ProjectServiceInterface {
 
     private Project getProjectIfExisting(final String id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+                .orElseThrow(() -> new NotFoundException("project" , "id: " + id));
     }
 
     private User getOwner(final String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 
     private void checkProjectMembership(final String username, final Project project) {
