@@ -1,7 +1,9 @@
 package com.example.kanban.user.service;
 
 import com.example.kanban.exception.ConflictException;
+import com.example.kanban.exception.IllegalRoleChangeException;
 import com.example.kanban.exception.NotFoundException;
+import com.example.kanban.exception.UnauthorizedException;
 import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
@@ -9,11 +11,9 @@ import com.example.kanban.user.model.Role;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.util.JwtUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,13 +51,10 @@ public class UserService {
     public String loginAndReturnToken(final LoginRequestDto requestDto) {
         final var user = userRepository.findByUsername(requestDto.username())
                 .orElseThrow(
-                        () -> new NotFoundException("user", "username " + requestDto.username()));
+                        () -> new UnauthorizedException("username"));
 
         if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Invalid password"
-            );
+            throw new UnauthorizedException("password");
         }
 
         return jwtUtil.generateToken(user.getUsername());
@@ -84,7 +81,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("user", "id" + userId));
 
         if (user.getUsername().equals("admin") && newRole != Role.ADMIN) {
-            throw new RuntimeException("Nie można zmienić roli głównemu administratorowi!");
+            throw new IllegalRoleChangeException("Main administrator role is protected");
         }
 
         user.setRole(newRole);
@@ -101,7 +98,7 @@ public class UserService {
         String username = jwtUtil.getUsernameFromToken(token);
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                .orElseThrow(() -> new UnauthorizedException("username"));
 
         return new UserResponseDto(
                 user.getId(),
