@@ -23,7 +23,6 @@ export default function SideBar() {
 
   return (
     <>
-      {/* Mobile menu button */}
       <button
         className="lg:hidden fixed top-4 left-4 z-50 bg-gray-200 p-2 rounded-lg shadow-md hover:bg-gray-300 transition-colors"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -58,7 +57,7 @@ export default function SideBar() {
           Add Project
         </Button>
 
-        <StatusWrapper loading={loading} error={error}>
+        <StatusWrapper loading={loading && projects.length === 0} error={error}>
           <ul className="space-y-4">
             {projects?.map((project) => (
               <li key={project.id} className="flex flex-col gap-2">
