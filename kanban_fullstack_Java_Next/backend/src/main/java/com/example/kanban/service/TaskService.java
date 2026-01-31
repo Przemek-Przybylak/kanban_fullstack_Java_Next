@@ -1,6 +1,7 @@
 package com.example.kanban.service;
 
 import com.example.kanban.DTO.*;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.repository.UserRepository;
@@ -49,7 +50,7 @@ public class TaskService implements TaskServiceInterface {
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
-        final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new NotFoundException("task", "id: " + id));
 
         existingTask.setTitle(taskDto.title());
         existingTask.setDescription(taskDto.description());
@@ -84,7 +85,7 @@ public class TaskService implements TaskServiceInterface {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteTask(final String id, final String username) {
         final var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+                .orElseThrow(() -> new NotFoundException("task", "id: " + id));
 
         taskRepository.delete(task);
     }
@@ -94,7 +95,7 @@ public class TaskService implements TaskServiceInterface {
     @Override
     public void updateStatus(String taskId, String newStatus) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+                .orElseThrow(() -> new NotFoundException("task", "id: " + taskId));
 
         task.setStatus(newStatus);
 
@@ -103,6 +104,6 @@ public class TaskService implements TaskServiceInterface {
 
     private Task getTaskIfExisting(final String id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+                .orElseThrow(() -> new NotFoundException("task", "id: " + id));
     }
 }
