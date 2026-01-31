@@ -10,13 +10,14 @@ import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
-import com.example.kanban.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -38,9 +39,6 @@ public class ProjectServiceTest {
 
     @Mock
     UserRepository userRepository;
-
-    @Mock
-    UserService userService;
 
     @InjectMocks
     ProjectService projectService;
@@ -78,7 +76,7 @@ public class ProjectServiceTest {
         String projectId = "p1";
         String username = "admin";
         String userId = "user-123";
-        TaskRequestDto requestDto = new TaskRequestDto("t1", "desc", "todo", null, null);
+        TaskRequestDto requestDto = new TaskRequestDto("t1", "desc", "todo", null, null, "admin", "0");
 
         User user = new User();
         user.setId(userId);
@@ -87,8 +85,6 @@ public class ProjectServiceTest {
         Project project = new Project();
         project.setId(projectId);
         project.setUsers(List.of(user));
-
-        when(userService.getUserIdFromUsername(username)).thenReturn(userId);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
@@ -105,7 +101,7 @@ public class ProjectServiceTest {
 
     @Test
     void shouldThrowExceptionWhenProjectInTaskNotFound() {
-        TaskRequestDto task = new TaskRequestDto("title", "desc", "todo", null, null);
+        TaskRequestDto task = new TaskRequestDto("title", "desc", "todo", null, null, "admin", "0");
 
         when(projectRepository.findById("p1"))
                 .thenReturn(Optional.empty());
@@ -154,8 +150,6 @@ public class ProjectServiceTest {
         existingProject.setUsers(List.of(user));
         existingProject.setTasks(new ArrayList<>());
 
-        when(userService.getUserIdFromUsername(username)).thenReturn(userId);
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(existingProject));
         when(projectRepository.save(any(Project.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -165,25 +159,28 @@ public class ProjectServiceTest {
 
         assertEquals("new title", result.title());
         verify(projectRepository).save(any(Project.class));
-        verify(userService).getUserIdFromUsername(username);
     }
 
     @Test
     void shouldDeleteProject() {
+        String projectId = "123";
+        String username = "u1";
         Project project = new Project();
-        project.setId("123");
+        project.setId(projectId);
+        project.setUsers(new ArrayList<>());
 
-        User user = new User();
-        user.setUsername("u1");
+        SecurityContext securityContext = mock(SecurityContext.class);
 
-        project.setUsers(List.of(user));
 
-        when(projectRepository.findById("123"))
-                .thenReturn(Optional.of(project));
+        SecurityContextHolder.setContext(securityContext);
 
-        projectService.deleteProject("123", user.getUsername());
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        assertDoesNotThrow(() -> projectService.deleteProject(projectId, username));
 
         verify(projectRepository).delete(project);
+
+        SecurityContextHolder.clearContext();
     }
 
     @Test
