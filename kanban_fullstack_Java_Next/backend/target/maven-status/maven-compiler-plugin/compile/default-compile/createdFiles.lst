@@ -4,6 +4,7 @@ com\example\kanban\service\ProjectServiceInterface.class
 com\example\kanban\validation\OnUpdate.class
 com\example\kanban\model\TaskRepository.class
 com\example\kanban\service\TaskServiceInterface.class
+com\example\kanban\config\ResourceGuard.class
 com\example\kanban\model\Task.class
 com\example\kanban\user\dto\LoginRequestDto.class
 com\example\kanban\DTO\Mapper.class
@@ -21,8 +22,10 @@ com\example\kanban\user\controller\AuthController.class
 com\example\kanban\controller\ProjectController.class
 com\example\kanban\config\SecurityConfig.class
 com\example\kanban\user\model\Role.class
+com\example\kanban\user\model\RoleUpdateRequest.class
 com\example\kanban\config\JwtCookieFilter.class
 com\example\kanban\validation\OnCreate.class
+com\example\kanban\DTO\TaskStatusRequest.class
 com\example\kanban\user\model\User.class
 com\example\kanban\util\UpdateIfNotNull.class
 com\example\kanban\service\TaskService.class
