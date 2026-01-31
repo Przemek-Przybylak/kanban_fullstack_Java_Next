@@ -1,6 +1,7 @@
 package com.example.kanban.service;
 
 import com.example.kanban.DTO.*;
+import com.example.kanban.exception.ForbiddenException;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
@@ -8,11 +9,9 @@ import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -140,7 +139,7 @@ public class ProjectService implements ProjectServiceInterface {
 
     private Project getProjectIfExisting(final String id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("project" , "id: " + id));
+                .orElseThrow(() -> new NotFoundException("project", "id: " + id));
     }
 
     private User getOwner(final String username) {
@@ -155,10 +154,7 @@ public class ProjectService implements ProjectServiceInterface {
                 .anyMatch(user -> Objects.equals(user.getId(), ownerId));
 
         if (!isMember) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "You don't have access for this project"
-            );
+            throw new ForbiddenException("project");
         }
     }
 }
