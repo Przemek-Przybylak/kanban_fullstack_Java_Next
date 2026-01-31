@@ -1,5 +1,6 @@
 package com.example.kanban.user.controller;
 
+import com.example.kanban.exception.UnauthorizedException;
 import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
@@ -12,9 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,14 +70,14 @@ public class AuthController {
     public UserResponseDto me(HttpServletRequest request) {
 
         if (request.getCookies() == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedException("username");
         }
 
         String token = Arrays.stream(request.getCookies())
                 .filter(c -> "token".equals(c.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                .orElseThrow(() -> new UnauthorizedException("username"));
 
         return userService.getMeFromToken(token);
     }
