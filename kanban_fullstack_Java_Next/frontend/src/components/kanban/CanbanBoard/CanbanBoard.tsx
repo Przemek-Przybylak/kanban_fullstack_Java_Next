@@ -43,7 +43,7 @@ export default function CanbanBoard() {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto p-1 lg:p-0">
+      <div className="flex flex-row gap-4 w-full h-full min-h-[500px] items-start">
         {statusColumn.map((column) => {
           const filteredTasks = tasks.filter(
             (task) => task.status === column.value
