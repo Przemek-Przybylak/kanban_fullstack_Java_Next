@@ -9,7 +9,6 @@ import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -129,7 +128,6 @@ public class ProjectService implements ProjectServiceInterface {
     @Override
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteProject(final String id, final String username) {
-        System.out.println("Moje role: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         var project = getProjectIfExisting(id);
 
         if (project.getUsers() != null) {
