@@ -21,7 +21,7 @@ export default function ProjectPage() {
 
   return (
     <>
-      <StatusWrapper loading={loading} error={error}>
+      <StatusWrapper loading={loading && tasks.length === 0} error={error}>
         {type === "addProject" && <AddProjectModal />}
         {type === "addTask" && <TaskFormModal />}
         {type === "editTask" && <TaskFormModal />}
