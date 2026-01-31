@@ -23,7 +23,7 @@ export default function CanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`p-6 rounded-lg shadow-md transition-all duration-300 flex flex-col min-w-[300px] ${
+      className={`p-4 rounded-lg shadow-md transition-all duration-300 flex flex-col flex-1 min-w-0 ${
         isOver ? "bg-blue-50 ring-2 ring-blue-300 scale-[1.01]" : "bg-gray-100"
       }`}
     >
