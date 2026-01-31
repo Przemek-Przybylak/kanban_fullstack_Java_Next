@@ -1,16 +1,16 @@
 package com.example.kanban.service;
 
-import com.example.kanban.DTO.*;
+import com.example.kanban.DTO.Mapper;
+import com.example.kanban.DTO.TaskPatchRequestDto;
+import com.example.kanban.DTO.TaskRequestDto;
+import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
