@@ -28,9 +28,6 @@ export default function CanbanBoard() {
  const handleDragEnd = (event: DragEndEvent) => {
    const { active, over } = event;
 
-   console.log("Przeciągany element (active):", active.id);
-   console.log("Upuszczono nad (over):", over?.id);
-
    if (!over) return;
 
    const taskId = active.id as string;
