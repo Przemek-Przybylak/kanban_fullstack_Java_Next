@@ -62,22 +62,22 @@ public class UserService {
 
 
     @Transactional
-    public User getUserById(String id) {
+    public User getUserById(final String id) {
 
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("user", "id: " + id));
     }
 
     @Transactional
-    public String getUserIdFromUsername(String username) {
+    public String getUserIdFromUsername(final String username) {
         return userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 
     @Transactional
-    public void changeUserRole(String userId, Role newRole) {
-        User user = userRepository.findById(userId)
+    public void changeUserRole(final String userId, final Role newRole) {
+        var user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user", "id" + userId));
 
         if (user.getUsername().equals("admin") && newRole != Role.ADMIN) {
@@ -95,9 +95,9 @@ public class UserService {
     }
 
     public UserResponseDto getMeFromToken(String token) {
-        String username = jwtUtil.getUsernameFromToken(token);
+        final var username = jwtUtil.getUsernameFromToken(token);
 
-        User user = userRepository.findByUsername(username)
+        var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UnauthorizedException("username"));
 
         return new UserResponseDto(
