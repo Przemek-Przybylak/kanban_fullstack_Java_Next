@@ -9,9 +9,7 @@ import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +31,6 @@ public class ProjectService implements ProjectServiceInterface {
         this.userService = userService;
     }
 
-    @Transactional
     @Override
     public List<TaskResponseDto> getTasksByProject(final String id) {
         final var taskList = taskRepository.findByProjectId(id).stream()
@@ -43,9 +40,7 @@ public class ProjectService implements ProjectServiceInterface {
         return taskList;
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
         final Project project = getProjectIfExisting(projectId);
 
@@ -61,7 +56,6 @@ public class ProjectService implements ProjectServiceInterface {
         return Mapper.toDto(task);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ProjectResponseDto> getAllProjects() {
         final var projects = projectRepository.findAll();
@@ -71,7 +65,6 @@ public class ProjectService implements ProjectServiceInterface {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ProjectResponseDto getProject(final String id) {
         final var project = getProjectIfExisting(id);
@@ -79,7 +72,6 @@ public class ProjectService implements ProjectServiceInterface {
         return Mapper.toDto(project);
     }
 
-    @Transactional
     @Override
     public ProjectResponseDto addProject(final ProjectRequestDto projectDto, final String username) {
         var owner = getOwner(username);
@@ -95,9 +87,7 @@ public class ProjectService implements ProjectServiceInterface {
         return Mapper.toDto(savedProject);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editProject(final String id, final ProjectRequestDto projectDto, final String username) {
         var existingProject = getProjectIfExisting(id);
 
@@ -109,11 +99,9 @@ public class ProjectService implements ProjectServiceInterface {
         return Mapper.toDto(savedProject);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editPartialProject(final String id, final ProjectPatchRequestDto project, final String username) {
-        Project existingProject = getProjectIfExisting(id);
+        var existingProject = getProjectIfExisting(id);
 
         updateIfNotNull(project.description(), existingProject::setDescription);
         updateIfNotNull(project.title(), existingProject::setTitle);
@@ -123,11 +111,9 @@ public class ProjectService implements ProjectServiceInterface {
         return Mapper.toDto(savedProject);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
-    public void deleteProject(final String id, final String username) {
-        var project = getProjectIfExisting(id);
+    public void deleteProject(final String id) {
+        final var project = getProjectIfExisting(id);
 
         if (project.getUsers() != null) {
             project.getUsers().forEach(user -> user.getProjects().remove(project));
@@ -148,7 +134,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     private void checkProjectMembership(final String username, final Project project) {
-        String ownerId = userService.getUserIdFromUsername(username);
+        final var ownerId = userService.getUserIdFromUsername(username);
 
         boolean isMember = project.getUsers().stream()
                 .anyMatch(user -> Objects.equals(user.getId(), ownerId));
