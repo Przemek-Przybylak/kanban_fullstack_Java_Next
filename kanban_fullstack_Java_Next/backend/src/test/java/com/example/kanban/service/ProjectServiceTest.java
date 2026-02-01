@@ -176,7 +176,7 @@ public class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        assertDoesNotThrow(() -> projectService.deleteProject(projectId, username));
+        assertDoesNotThrow(() -> projectService.deleteProject(projectId));
 
         verify(projectRepository).delete(project);
 
@@ -186,13 +186,12 @@ public class ProjectServiceTest {
     @Test
     void shouldThrowExceptionWhenProjectToDeleteNotExist() {
         String projectId = "123";
-        String username = "u1";
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
         ResponseStatusException exception =
                 assertThrows(ResponseStatusException.class,
-                        () -> projectService.deleteProject(projectId, username));
+                        () -> projectService.deleteProject(projectId));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Project not found", exception.getReason());
