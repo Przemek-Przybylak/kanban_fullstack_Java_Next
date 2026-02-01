@@ -100,24 +100,24 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     }
   },
 
-moveTask: async (taskId: string, newStatus: string) => {
+  moveTask: async (taskId: string, newStatus: string) => {
+    set({ error: null });
+
     const previousTasks = get().tasks;
 
     set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
+      tasks: state.tasks.map((t) =>
+        t.id === taskId ? { ...t, status: newStatus } : t,
       ),
     }));
 
     try {
       await patchTask(taskId, { status: newStatus });
-
-    } catch (error) {
+    } catch (error: any) {
       set({
         tasks: previousTasks,
-        error: "Failed to move task. Reverting..."
+        error: error.message,
       });
-      console.error(error);
     }
   },
 }));
