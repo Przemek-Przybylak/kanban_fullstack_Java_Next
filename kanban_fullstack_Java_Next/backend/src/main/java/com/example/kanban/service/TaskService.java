@@ -26,7 +26,6 @@ public class TaskService implements TaskServiceInterface {
         this.userRepository = userRepository;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<TaskResponseDto> getAllTasks() {
         var allTasks = taskRepository.findAll();
@@ -36,7 +35,6 @@ public class TaskService implements TaskServiceInterface {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public TaskResponseDto getTask(final String id) {
         final var task = getTaskIfExisting(id);
@@ -44,9 +42,7 @@ public class TaskService implements TaskServiceInterface {
         return Mapper.toDto(task);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
@@ -63,9 +59,7 @@ public class TaskService implements TaskServiceInterface {
         return Mapper.toDto(savedTask);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public TaskResponseDto editPartialTask(final String id, final TaskPatchRequestDto taskDto, final String username) {
         var existingTask = getTaskIfExisting(id);
 
@@ -80,9 +74,7 @@ public class TaskService implements TaskServiceInterface {
         return Mapper.toDto(savedTask);
     }
 
-    @Transactional
     @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteTask(final String id, final String username) {
         final var task = taskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("task", "id: " + id));
@@ -90,11 +82,9 @@ public class TaskService implements TaskServiceInterface {
         taskRepository.delete(task);
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#taskId)")
     @Override
-    public void updateStatus(String taskId, String newStatus) {
-        Task task = taskRepository.findById(taskId)
+    public void updateStatus(final String taskId, final String newStatus) {
+        var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("task", "id: " + taskId));
 
         task.setStatus(newStatus);

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional
 public interface TaskServiceInterface {
     @Transactional(readOnly = true)
     List<TaskResponseDto> getAllTasks();
@@ -15,16 +16,15 @@ public interface TaskServiceInterface {
     @Transactional(readOnly = true)
     TaskResponseDto getTask(String id);
 
-    @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     TaskResponseDto editTask(String id, TaskRequestDto taskDto, String username);
 
-    @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     TaskResponseDto editPartialTask(String id, TaskPatchRequestDto task, String username);
 
-    @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     void deleteTask(String id, String username);
 
-    @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#taskId)")
     void updateStatus(String taskId, String newStatus);
 }
