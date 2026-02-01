@@ -14,7 +14,13 @@ D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\examp
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskRequestDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskResponseDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskStatusRequest.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ConflictException.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ErrorResponse.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ForbiddenException.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\GlobalExceptionHandler.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\IllegalRoleChangeException.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\NotFoundException.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\UnauthorizedException.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ValidationErrorResponse.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\KanbanApplication.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\model\Project.java
@@ -34,6 +40,7 @@ D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\examp
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\model\User.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\repository\UserRepository.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\service\UserService.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\service\UserServiceInterface.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\util\JwtUtil.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\util\HasId.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\util\LocationUtil.java
