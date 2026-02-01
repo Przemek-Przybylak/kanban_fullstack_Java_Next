@@ -32,12 +32,12 @@ public class AuthController {
 
     @PostMapping(value = "/register", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto register(@RequestBody RegisterRequestDto requestDto) {
+    public UserResponseDto register(@Valid @RequestBody RegisterRequestDto requestDto) {
         return userService.register(requestDto);
     }
 
     @PostMapping("/login")
-    public UserResponseDto login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+    public UserResponseDto login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
         String token = userService.loginAndReturnToken(requestDto);
 
 
@@ -56,7 +56,7 @@ public class AuthController {
     }
 
     @PatchMapping("/{userId}/role")
-    public ResponseEntity<Void> updateUserRole(@PathVariable String userId, @RequestBody @Valid RoleUpdateRequest roleUpdate) {
+    public ResponseEntity<Void> updateUserRole(@PathVariable String userId, @Valid @RequestBody RoleUpdateRequest roleUpdate) {
         userService.changeUserRole(userId, roleUpdate.role());
         return ResponseEntity.ok().build();
     }
