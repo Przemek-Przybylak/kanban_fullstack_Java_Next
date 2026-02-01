@@ -1,6 +1,7 @@
 import { PostTask } from "../types/postTask";
 import CreateProjectRequestDTO, { Project } from "../types/projects";
 import { Task } from "../types/task";
+import { handleResponse } from "../utils/handleResponse";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -21,16 +22,16 @@ export async function fetchProjectsFromApi() {
   const res = await fetch(`${BASE_URL}/projects`, {
     credentials: "include",
   });
-  if (!res.ok) throw new Error("Failed to fetch projects");
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function fetchProjectFromApi(id: string) {
   const res = await fetch(`${BASE_URL}/projects/${id}`, {
     credentials: "include",
   });
-  if (!res.ok) throw new Error("Failed to fetch project");
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function postProject(project: CreateProjectRequestDTO) {
@@ -40,8 +41,8 @@ export async function postProject(project: CreateProjectRequestDTO) {
     credentials: "include",
     body: JSON.stringify(project),
   });
-  checkPermission(res);
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function putProject(id: string, project: Project) {
@@ -51,8 +52,8 @@ export async function putProject(id: string, project: Project) {
     credentials: "include",
     body: JSON.stringify(project),
   });
-  checkPermission(res);
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function deleteProjectFromApi(id: string) {
@@ -61,9 +62,7 @@ export async function deleteProjectFromApi(id: string) {
     credentials: "include",
   });
 
-  checkPermission(res);
-
-  return true;
+  return handleResponse(res);
 }
 
 // -------- TASKS --------
@@ -72,16 +71,16 @@ export async function fetchTasksByProjectId(projectId: string) {
   const res = await fetch(`${BASE_URL}/projects/${projectId}/tasks`, {
     credentials: "include",
   });
-  if (!res.ok) throw new Error("Failed to fetch tasks");
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function fetchTask(taskId: string) {
   const res = await fetch(`${BASE_URL}/tasks/${taskId}`, {
     credentials: "include",
   });
-  if (!res.ok) throw new Error("Failed to fetch task");
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function postTask(task: PostTask) {
@@ -99,8 +98,8 @@ export async function postTask(task: PostTask) {
     } catch {}
     throw new Error(errorMessage);
   }
-  checkPermission(res);
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function putTask(taskId: string, newData: Task) {
@@ -110,8 +109,8 @@ export async function putTask(taskId: string, newData: Task) {
     credentials: "include",
     body: JSON.stringify(newData),
   });
-  checkPermission(res);
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function deleteTaskFromApi(id: string) {
@@ -119,8 +118,8 @@ export async function deleteTaskFromApi(id: string) {
     method: "DELETE",
     credentials: "include",
   });
-  checkPermission(res);
-  return true;
+
+  return handleResponse(res);
 }
 
 // -------- AUTH --------
@@ -133,9 +132,7 @@ export async function loginUser(username: string, password: string) {
     body: JSON.stringify({ username, password }),
   });
 
-  if (!res.ok) throw new Error("Login failed");
-
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function registerUser(username: string, password: string) {
@@ -146,20 +143,15 @@ export async function registerUser(username: string, password: string) {
     body: JSON.stringify({ username, password }),
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: "Unknown error" }));
-    throw new Error(err.message || "Registration failed");
-  }
-
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function fetchMe() {
   const res = await fetch(`${BASE_URL}/auth/me`, {
     credentials: "include",
   });
-  if (!res.ok) return null;
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function logoutUser() {
@@ -175,11 +167,7 @@ export async function getUsers() {
     credentials: "include",
   });
 
-  if (!res.ok) {
-    console.error("Cannot get users");
-    return null;
-  }
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function changeRole(userId: string, newRole: string) {
@@ -192,12 +180,7 @@ export async function changeRole(userId: string, newRole: string) {
     body: JSON.stringify({ role: newRole }),
   });
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Role cannot be change");
-  }
-
-  return true;
+  return handleResponse(res);
 }
 
 export async function patchTask(taskId: string, updatedFields: Partial<Task>) {
@@ -207,5 +190,5 @@ export async function patchTask(taskId: string, updatedFields: Partial<Task>) {
     credentials: "include",
     body: JSON.stringify(updatedFields),
   });
-  checkPermission(res);
+  return handleResponse(res);
 }
