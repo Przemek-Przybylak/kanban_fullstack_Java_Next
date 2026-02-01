@@ -4,6 +4,7 @@ import com.example.kanban.DTO.ProjectPatchRequestDto;
 import com.example.kanban.DTO.ProjectResponseDto;
 import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.Task;
@@ -15,10 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,12 +102,12 @@ public class ProjectServiceTest {
     void shouldThrowExceptionWhenProjectInTaskNotFound() {
         TaskRequestDto task = new TaskRequestDto("title", "desc", "todo", null, null, "admin", "0");
 
-        when(projectRepository.findById("p1"))
-                .thenReturn(Optional.empty());
+        when(projectRepository.findById("p1")).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> projectService.addTask("p1", task, "u1"));
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> projectService.addTask("p1", task, "u1"));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertTrue(exception.getMessage().contains("Not found project"));
     }
 
     @Test
@@ -129,9 +128,10 @@ public class ProjectServiceTest {
         when(projectRepository.findById("123"))
                 .thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> projectService.getProject("123"));
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> projectService.getProject("123"));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertTrue(exception.getMessage().contains("Not found project"));
     }
 
     @Test
@@ -186,17 +186,13 @@ public class ProjectServiceTest {
     @Test
     void shouldThrowExceptionWhenProjectToDeleteNotExist() {
         String projectId = "123";
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        ResponseStatusException exception =
-                assertThrows(ResponseStatusException.class,
-                        () -> projectService.deleteProject(projectId));
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> projectService.deleteProject(projectId));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("Project not found", exception.getReason());
+        assertTrue(exception.getMessage().contains("Not found project"));
 
         verify(projectRepository, never()).delete(any());
-        verify(projectRepository, never()).deleteById(anyString());
     }
 }

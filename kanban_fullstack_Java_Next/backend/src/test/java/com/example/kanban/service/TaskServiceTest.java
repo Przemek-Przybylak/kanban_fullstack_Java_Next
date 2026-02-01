@@ -2,23 +2,19 @@ package com.example.kanban.service;
 
 import com.example.kanban.DTO.TaskPatchRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
-import com.example.kanban.model.ProjectRepository;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
-import com.example.kanban.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -46,12 +42,11 @@ public class TaskServiceTest {
 
     @Test
     void shouldThrowExceptionWhenTaskNotFound() {
-        when(taskRepository.findById("123"))
-                .thenReturn(Optional.empty());
+        when(taskRepository.findById("123")).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> taskService.getTask("123"));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> taskService.getTask("123"));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertTrue(exception.getMessage().contains("Not found task"));
     }
 
     @Test
@@ -102,15 +97,13 @@ public class TaskServiceTest {
     void shouldThrowExceptionWhenTaskToDeleteNotExist() {
         String taskId = "123";
         String username = "u1";
-
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 taskService.deleteTask(taskId, username)
         );
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("Task not found", exception.getReason());
+        assertTrue(exception.getMessage().toLowerCase().contains("not found task"));
 
         verify(taskRepository, never()).delete(any());
         verify(taskRepository, never()).deleteById(anyString());
