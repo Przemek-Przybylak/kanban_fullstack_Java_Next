@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserServiceInterface{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -30,7 +30,6 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
-    @Transactional
     public UserResponseDto register(final RegisterRequestDto requestDto) {
         Optional<User> isUsernameUse = userRepository.findByUsername(requestDto.
                 username());
@@ -60,22 +59,18 @@ public class UserService {
         return jwtUtil.generateToken(user.getUsername());
     }
 
-
-    @Transactional
     public User getUserById(final String id) {
 
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("user", "id: " + id));
     }
 
-    @Transactional
     public String getUserIdFromUsername(final String username) {
         return userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 
-    @Transactional
     public void changeUserRole(final String userId, final Role newRole) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user", "id" + userId));
