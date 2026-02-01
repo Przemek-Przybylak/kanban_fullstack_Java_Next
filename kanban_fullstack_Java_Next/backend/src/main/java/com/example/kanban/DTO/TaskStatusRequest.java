@@ -1,3 +1,5 @@
 package com.example.kanban.DTO;
 
-public record TaskStatusRequest(String status) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record TaskStatusRequest(@NotBlank String status) {}
