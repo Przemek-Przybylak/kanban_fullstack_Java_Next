@@ -6,6 +6,7 @@ import com.example.kanban.service.TaskService;
 import com.example.kanban.util.LocationUtil;
 import com.example.kanban.validation.OnCreate;
 import com.example.kanban.validation.OnUpdate;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -42,7 +43,7 @@ public class ProjectController {
     }
 
     @PatchMapping("/{taskId}/tasks")
-    public ResponseEntity<Void> updateTaskStatus(@PathVariable String taskId, @RequestBody TaskStatusRequest request, Authentication authentication) {
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable String taskId, @Valid @RequestBody TaskStatusRequest request) {
 
         taskService.updateStatus(taskId, request.status());
 
@@ -83,9 +84,9 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable String id, Authentication authentication) {
+    public ResponseEntity<Void> deleteProject(@PathVariable String id) {
 
-        projectService.deleteProject(id, authentication.getName());
+        projectService.deleteProject(id);
 
         return ResponseEntity.noContent().build();
     }
