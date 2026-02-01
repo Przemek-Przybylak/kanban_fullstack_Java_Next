@@ -1,5 +1,4 @@
 export async function handleResponse(res) {
-  console.log("DEBUG: API Response Status ->", res.status);
   if (res.ok) {
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
