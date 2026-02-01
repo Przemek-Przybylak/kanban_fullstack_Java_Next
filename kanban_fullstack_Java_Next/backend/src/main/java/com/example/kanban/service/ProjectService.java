@@ -9,6 +9,7 @@ import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#projectId)")
     public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
         final Project project = getProjectIfExisting(projectId);
 
@@ -88,6 +90,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editProject(final String id, final ProjectRequestDto projectDto, final String username) {
         var existingProject = getProjectIfExisting(id);
 
@@ -100,6 +103,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editPartialProject(final String id, final ProjectPatchRequestDto project, final String username) {
         var existingProject = getProjectIfExisting(id);
 
@@ -112,6 +116,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteProject(final String id) {
         final var project = getProjectIfExisting(id);
 

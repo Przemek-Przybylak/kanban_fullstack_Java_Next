@@ -10,7 +10,6 @@ import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,6 +42,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
@@ -60,6 +60,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public TaskResponseDto editPartialTask(final String id, final TaskPatchRequestDto taskDto, final String username) {
         var existingTask = getTaskIfExisting(id);
 
@@ -75,6 +76,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public void deleteTask(final String id, final String username) {
         final var task = taskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("task", "id: " + id));
@@ -83,6 +85,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#taskId)")
     public void updateStatus(final String taskId, final String newStatus) {
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("task", "id: " + taskId));
