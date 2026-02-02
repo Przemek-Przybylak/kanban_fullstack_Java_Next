@@ -6,7 +6,7 @@ import { ModalWrapper } from "./ModalsWrapper";
 import { useModalStore } from "../../stores/useModalStore";
 import { useProjectsStore } from "../../stores/useProjectsStore";
 import Input from "../Input/Input";
-import CreateProjectRequestDTO, { Project } from "../../types/projects";
+import CreateProjectRequestDTO from "../../types/projects";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { validateRequired } from "../../utils/validators";
 
@@ -23,17 +23,17 @@ export const AddProjectModal = () => {
   if (type !== "addProject") return null;
 
   const validate = () => {
-      const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {};
 
-      const titleError = validateRequired(newProject.title);
-      if (titleError) newErrors.title = titleError;
+    const titleError = validateRequired(newProject.title);
+    if (titleError) newErrors.title = titleError;
 
-      const descError = validateRequired(newProject.description, 10);
-      if (descError) newErrors.description = descError;
+    const descError = validateRequired(newProject.description, 10);
+    if (descError) newErrors.description = descError;
 
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    };
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,7 +67,6 @@ export const AddProjectModal = () => {
         <Input
           label="Description"
           multiline={true}
-          rows={3}
           value={newProject.description}
           error={errors.description}
           onChange={(e) =>
