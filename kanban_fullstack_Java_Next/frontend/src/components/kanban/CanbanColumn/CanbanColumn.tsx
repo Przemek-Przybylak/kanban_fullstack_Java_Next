@@ -1,5 +1,5 @@
 import React from "react";
-import { useDroppable } from "@dnd-kit/core"; // <--- Musi być ten import
+import { useDroppable } from "@dnd-kit/core";
 import { useModalStore } from "../../../stores/useModalStore";
 import { Task } from "../../../types/task";
 import Button from "../../Button/Button";
