@@ -9,13 +9,6 @@ const JSON_HEADERS = {
   "Content-Type": "application/json",
 };
 
-function checkPermission(res: Response) {
-  if (res.status === 403) {
-    throw new Error("FORBIDDEN");
-  }
-  if (!res.ok) throw new Error(`DELETE_FAILED`);
-}
-
 // -------- PROJECTS --------
 
 export async function fetchProjectsFromApi() {

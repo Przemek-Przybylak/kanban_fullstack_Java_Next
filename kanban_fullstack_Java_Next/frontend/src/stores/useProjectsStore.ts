@@ -6,7 +6,6 @@ import {
   postProject,
   putProject,
 } from "../lib/api";
-import ProjectRequest, { Project } from "../types/projects";
 import CreateProjectRequestDTO from "../types/projects";
 
 interface ProjectsStore {
@@ -79,7 +78,7 @@ export const useProjectsStore = create<ProjectsStore>((set) => ({
         projects: state.projects.filter((p) => p.id !== id),
         loading: false,
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.message === "FORBIDDEN") {
         set({
           error: "You dont have permission to delete this project",

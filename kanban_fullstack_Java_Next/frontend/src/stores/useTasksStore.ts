@@ -113,7 +113,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 
     try {
       await patchTask(taskId, { status: newStatus });
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         tasks: previousTasks,
         error: error.message,
