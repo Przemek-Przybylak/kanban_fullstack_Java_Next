@@ -20,7 +20,7 @@ export default function UsersTable() {
     try {
       const data = await getUsers();
       if (data) setUsers(data);
-    } catch (err) {
+    } catch {
       setError("Cannot fetch users");
     } finally {
       setLoading(false);
@@ -38,7 +38,7 @@ export default function UsersTable() {
         prev.map((u) => (u.id === id ? { ...u, role: newRole } : u)),
       );
       alert("Role have been changed");
-    } catch (err: any) {
+    } catch (err: unknown) {
       alert(err.message || "Error with Role change");
     }
   };

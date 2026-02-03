@@ -26,7 +26,7 @@ export async function handleResponse(res) {
     if (data && data.message) {
       finalMessage = data.message;
     }
-  } catch (_e) {}
+  } catch {}
 
   throw new Error(finalMessage);
 }
