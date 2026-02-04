@@ -40,13 +40,12 @@ public class AuthController {
     public UserResponseDto login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
         String token = userService.loginAndReturnToken(requestDto);
 
-
         org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("token", token)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)    // MUSI BYĆ TRUE (dla HTTPS na Renderze)
                 .path("/")
                 .maxAge(60 * 60)
-                .sameSite("Lax")
+                .sameSite("None") // MUSI BYĆ NONE (żeby Vercel mógł pogadać z Renderem)
                 .build();
 
         response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
