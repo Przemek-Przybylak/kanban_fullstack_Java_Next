@@ -155,7 +155,7 @@ export async function logoutUser() {
 }
 
 export async function getUsers() {
-  const res = await fetch(`http://localhost:8080/auth/users`, {
+  const res = await fetch(`${BASE_URL}/auth/users`, {
     method: "GET",
     credentials: "include",
   });
