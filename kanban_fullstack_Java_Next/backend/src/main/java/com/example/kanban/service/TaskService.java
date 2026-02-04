@@ -46,7 +46,7 @@ public class TaskService implements TaskServiceInterface {
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
 
-        final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new NotFoundException("task", "id: " + id));
+        final var user = userRepository.findByUsername(taskDto.username()).orElseThrow(() -> new NotFoundException("user", "usrname: " + taskDto.username()));
 
         existingTask.setTitle(taskDto.title());
         existingTask.setDescription(taskDto.description());
