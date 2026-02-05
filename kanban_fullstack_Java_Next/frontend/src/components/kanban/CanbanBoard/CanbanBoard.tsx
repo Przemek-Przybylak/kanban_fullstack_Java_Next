@@ -43,23 +43,38 @@ export default function CanbanBoard() {
     }
   };
 
-  return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="flex flex-row gap-4 w-full h-full min-h-[500px] items-start">
-        {statusColumn.map((column) => {
-          const filteredTasks = tasks.filter(
-            (task) => task.status === column.value,
-          );
+ return (
+   <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+     <div className="
+       flex flex-row gap-4 items-start
+       w-full h-full min-h-[500px]
 
-          return (
-            <CanbanColumn
-              key={column.colId}
-              id={column.value}
-              tasks={filteredTasks}
-            />
-          );
-        })}
-      </div>
-    </DndContext>
-  );
+       overflow-x-auto overflow-y-hidden
+
+       snap-x snap-mandatory
+
+       scrollbar-hide
+
+       px-4 pb-6 md:px-0
+     ">
+       {statusColumn.map((column) => {
+         const filteredTasks = tasks.filter(
+           (task) => task.status === column.value,
+         );
+
+         return (
+           <div
+             key={column.colId}
+             className="min-w-[85vw] md:min-w-[320px] md:flex-1 snap-center"
+           >
+             <CanbanColumn
+               id={column.value}
+               tasks={filteredTasks}
+             />
+           </div>
+         );
+       })}
+     </div>
+   </DndContext>
+ );
 }
