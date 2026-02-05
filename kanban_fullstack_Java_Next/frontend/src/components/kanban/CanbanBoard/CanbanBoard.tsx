@@ -43,38 +43,38 @@ export default function CanbanBoard() {
     }
   };
 
- return (
-   <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-     <div className="
-       flex flex-row gap-4 items-start
-       w-full h-full min-h-[500px]
+return (
+  <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <div className="
+      /* Mobile: scroll w poziomie, przyciąganie (snap) */
+      flex flex-row overflow-x-auto snap-x snap-mandatory px-4 pb-6
+      /* Desktop: brak scrolla, kolumny obok siebie */
+      md:overflow-x-visible md:snap-none md:px-0 md:pb-0 md:flex-row md:justify-between
+      gap-4 w-full h-full min-h-[500px] items-start scrollbar-hide
+    ">
+      {statusColumn.map((column) => {
+        const filteredTasks = tasks.filter(
+          (task) => task.status === column.value
+        );
 
-       overflow-x-auto overflow-y-hidden
-
-       snap-x snap-mandatory
-
-       scrollbar-hide
-
-       px-4 pb-6 md:px-0
-     ">
-       {statusColumn.map((column) => {
-         const filteredTasks = tasks.filter(
-           (task) => task.status === column.value,
-         );
-
-         return (
-           <div
-             key={column.colId}
-             className="min-w-[85vw] md:min-w-[320px] md:flex-1 snap-center"
-           >
-             <CanbanColumn
-               id={column.value}
-               tasks={filteredTasks}
-             />
-           </div>
-         );
-       })}
-     </div>
-   </DndContext>
- );
+        return (
+          <div
+            key={column.colId}
+            className="
+              /* Mobile: szeroka kolumna pod snap-scroll */
+              min-w-[85vw] snap-center
+              /* Desktop: elastyczna szerokość, mieści się w oknie */
+              md:min-w-0 md:w-full md:flex-1 md:snap-align-none
+            "
+          >
+            <CanbanColumn
+              id={column.value}
+              tasks={filteredTasks}
+            />
+          </div>
+        );
+      })}
+    </div>
+  </DndContext>
+);
 }
