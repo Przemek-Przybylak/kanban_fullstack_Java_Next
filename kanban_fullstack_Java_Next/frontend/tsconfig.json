@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "types": [
       "jest",
       "node",
@@ -42,7 +42,8 @@
     ".next/types/**/*.ts",
     "../types/columns.tsx",
     "../types/projects.ts",
-    "../types/task.ts"
+    "../types/task.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "frontend/node_modules"
