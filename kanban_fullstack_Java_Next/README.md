@@ -1,113 +1,101 @@
-# Kanban Board API 🚀
+# 🚀 Fullstack Kanban Board 2026
 
-A professional, secure, and scalable Kanban board backend built with **Java 21** and **Spring Boot 3**. This project demonstrates modern backend practices, including JWT authentication, Docker containerization, and clean architecture.
-
----
-
-## ✨ Features
-````
-✔ Full CRUD for Projects & Tasks** – Manage your workflow with ease.
-✔ JWT Authentication** – Secure access with JSON Web Tokens.
-✔ User-Task Association** – Automatic User ID extraction from tokens for data ownership.
-✔ Advanced Validation** – Using Validation Groups (`OnCreate`, `OnUpdate`) for data integrity.
-✔ Partial Updates** – Efficient `PATCH` endpoints for modifying specific task/project fields.
-✔ Global Exception Handling** – Consistent API error responses.
-✔ Interactive API Docs** – Fully documented with **Swagger UI (OpenAPI 3.0)**.
-✔ Automated Test User** – Auto-initializes an `admin` user on startup for easy testing.
-✔ Ownership Verification (ACL): Implementing security checks to ensure users can only access their own projects and tasks.
-````
----
-
-## 📦 Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Language** | Java 21 |
-| **Framework** | Spring Boot 3.4.x |
-| **Security** | Spring Security + JWT |
-| **Persistence** | Spring Data JPA |
-| **Database** | PostgreSQL |
-| **Documentation** | Swagger / OpenAPI |
-| **Containerization** | Docker & Docker Compose |
-| **Testing** | JUnit 5 & Mockito |
+A professional, secure, and highly responsive Kanban application. Integrated with Java Spring Boot 3 and React/Next.js to provide a seamless workflow management experience.
 
 ---
 
-## 🔑 Getting Started (API Usage)
+## ⚡ Quick Access (Live Version)
 
-### Default Test User
-The application automatically creates a test user on startup:
-- **Username:** `admin`
-- **Password:** `admin123`
+**The fastest way to explore the project. No local setup required.**
 
-### Authentication & Access
-- **Public Access:** Unauthenticated users can only access `/auth/**` and `GET /projects`.
-- **Protected Access:** All other endpoints (Tasks, Project modifications) require a valid JWT token.
-- **Login:** `POST /auth/login` to receive your JWT Token.
-- **Register:** `POST /auth/register` to create a new account.
-- **Authorization:** Add the token to your headers: `Authorization: Bearer <your_token>`.
-
-### Key Endpoints
-| Resource | Method      | Endpoint               | Description                                               |
-|----------|-------------|------------------------|-----------------------------------------------------------|
-| **Tasks** | `GET`       | `/tasks`               | List all tasks                                            |
-| | `GET`       | `/tasks/{id}`          | Get specific task by ID (requires ID in URL)              |
-| | `PATCH/PUT` | `/tasks/{id}`          | Edit task (requires ID in URL)                            |
-| | `DELETE`    | `/tasks/{id}`          | Remove task (requires ID in URL)                          |
-| **Projects** | `GET`       | `/projects`            | List all projects (Public)                                |
-| | `GET`       | `/projects/{id}`       | Get specific project by ID (requires ID in URL)           |
-| | `GET`       | `/projects/{id}/tasks` | Get all tasks for a specific project (requires ID in URL) |
-| | `Post`      | `/projects`            | Add a new Project                                         |
-| | `POST`      | `/projects/{id}/tasks` | Add a new task to a specific project (requires ID in URL) |
-| | `PATCH/PUT` | `/projects/{id}`       | Edit project (requires ID in URL)                         |
-| | `DELETE`    | `/projects/{id}`       | Remove project (requires ID in URL)                       |
-
----
-## 📁 Project Structure
-````
-src/ 
-├── main/ 
-│ ├── java/com/example/kanban/ 
-│ │ ├── config # Security & Global configurations 
-│ │ ├── controller # REST Endpoints 
-│ │ ├── service # Business Logic & Interfaces 
-│ │ ├── repository # JPA Data Access 
-│ │ ├── model # JPA Entities 
-│ │ ├── DTO # Request/Response objects (Records) 
-│ │ ├── util # Helper classes (Mappers, Update tools) 
-│ │ ├── user # User management & Authentication logic 
-│ │ └── exception # Global Exception Handler 
-│ └── resources/ 
-│ └── application.properties 
-└── test/ # Unit & Logic tests
-````
+* **Live Frontend:** https://kanban-fullstack-java-next.vercel.app/
+* **API Documentation:** https://kanban-fullstack-java-next.onrender.com/swagger-ui/index.html
+* **Test Credentials:** `admin` / `admin123`
 
 ---
 
-## 🐳 Running with Docker
+## 🏗️ System Architecture
 
-This is the recommended way to run the project. It handles both the App and the PostgreSQL database.
+### 💻 Frontend (The Experience)
 
-1. **Build and start:**
-   ```bash
-   docker compose up --build
-Access the API: http://localhost:8080
+* **Core:** React 19, Next.js 15, TypeScript.
+* **Drag & Drop:** Advanced gesture handling via `@dnd-kit`.
+* **Mobile UX:** Snap-to-center horizontal scroll with `85vw` card hints.
+* **Error Handling:** Global `StatusWrapper` for loaders and API error mapping.
 
-API Documentation: http://localhost:8080/swagger-ui/index.html
+### ⚙️ Backend (The Engine)
 
-## 🧪 Testing
-Current tests focus on the service layer using JUnit 5 and Mockito. To run them:
+* **Core:** Java 21, Spring Boot 3.4.
+* **Security:** Spring Security + JWT with strict Data Ownership (ACL).
+* **Database:** PostgreSQL managed via Docker.
+* **Optimization:** `PATCH` endpoints for efficient partial task updates.
+
+---
+
+## ✨ Key Features
+
+### 🔑 Secure Authentication & Ownership
+Full Register/Login flow. Every task and project is strictly linked to its creator using JWT claims, ensuring total data isolation between users.
+
+### 📱 Intelligent Mobile Layout
+The desktop board automatically transforms into a fluid horizontal "slider" on mobile devices. This prevents vertical clutter and improves ergonomics.
+
+### 🔄 Real-time UX Synchronization
+Optimistic UI updates ensure that moving a task feels instantaneous, while the backend processes the changes in the background.
+
+### ⚠️ Advanced Error Handling
+Unauthorized attempts or server errors are caught by the `StatusWrapper`, providing clear feedback like "Access Denied" instead of silent failures.
+
+---
+
+## 🛣️ API Reference (Endpoints)
+
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/auth/login` | Receive JWT Token | Public |
+| **GET** | `/projects` | List all user projects | Private |
+| **POST** | `/projects/{id}/tasks` | Add task to project | Private |
+| **PATCH** | `/tasks/{id}` | Update task (D&D / Edit) | Private |
+| **DELETE** | `/tasks/{id}` | Remove task | Private |
+
+---
+
+## 🚀 Local Development (Docker)
 
 
-./mvnw test
-## 🗺️ Roadmap (Upcoming Features)
-[NOW] React + Next.js Integration: Connecting a modern frontend (migrating from a legacy Express.js setup).
+# 1. Clone the repository
+https://github.com/Przemek-Przybylak/kanban_fullstack_Java_Next/tree/main/kanban_fullstack_Java_Next
 
-[NEXT] Advanced Testing: * Expanding Unit Tests to cover 90%+ of the codebase.
+```bash
 
-Implementing Integration Tests using Testcontainers for real PostgreSQL environment simulation.
+# 2. Start Backend & Database
+cd kanban-backend && docker compose up --build
 
-[PLAN] Deployment: Automated CI/CD pipeline for cloud deployment.
+# 3. Start Frontend
+cd ../kanban-frontend && npm install && npm run dev
+
+🧪 Roadmap & Progress
+
+[x] Core Backend: Spring Boot 3 + Java 21.
+
+[x] JWT Security: Authentication and ACL Ownership.
+
+[x] Advanced Mobile UX: Snap-scroll and 85vw layouts.
+
+[x] Responsive UI Fix: Clean desktop view (no scrollbars).
+
+[x] Global Error Handling: Integrated StatusWrapper.
+
+[x] Optimistic Updates: PATCH synchronization.
+
+[ ] Advanced Testing: 90%+ coverage (JUnit & Vitest).
+
+[ ] CI/CD: Automated deployment.
+```
+
+---
 
 ## 📬 Contact
-Project developed as part of a Backend Developer portfolio. Feel free to contact me for feedback or collaboration!edback, feel free to open an issue or contact me.
+Project developed as a showcase of Fullstack Development capabilities. Feel free to reach out for collaboration!
+
+Dev Tip: If the UI doesn't reflect latest CSS changes during development in IntelliJ, a manual IDE restart is recommended.
