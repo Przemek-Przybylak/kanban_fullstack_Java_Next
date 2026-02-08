@@ -1,5 +1,6 @@
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\DataInitializer.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\JwtCookieFilter.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\OpenApiConfig.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\ResourceGuard.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\SecurityConfig.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\controller\ProjectController.java

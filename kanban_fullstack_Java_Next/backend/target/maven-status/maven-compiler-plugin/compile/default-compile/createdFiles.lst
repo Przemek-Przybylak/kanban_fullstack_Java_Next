@@ -41,6 +41,7 @@ com\example\kanban\validation\OnCreate.class
 com\example\kanban\user\service\UserServiceInterface.class
 com\example\kanban\exception\IllegalRoleChangeException.class
 com\example\kanban\exception\ErrorResponse.class
+com\example\kanban\config\OpenApiConfig.class
 com\example\kanban\util\LocationUtil.class
 com\example\kanban\model\Project.class
 com\example\kanban\model\ProjectRepository.class
