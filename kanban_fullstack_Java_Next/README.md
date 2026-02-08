@@ -4,6 +4,10 @@ A professional, secure, and highly responsive Kanban application. Integrated wit
 
 ---
 
+
+https://github.com/user-attachments/assets/c9c2d7f4-dba2-4d15-8650-488b8500b848
+
+
 ## ⚡ Quick Access (Live Version)
 
 **The fastest way to explore the project. No local setup required.**
