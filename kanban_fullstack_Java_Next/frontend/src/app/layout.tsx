@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <ModalProvider>
         <body
           className={`${Inter} h-screen bg-gray-50 text-gray-900 font-sans flex flex-col lg:flex-row overflow-hidden`}
