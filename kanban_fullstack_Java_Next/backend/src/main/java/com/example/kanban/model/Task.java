@@ -4,9 +4,7 @@ import com.example.kanban.user.model.User;
 import com.example.kanban.util.HasId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 
+@Builder
 @Entity
 @Table(name = "tasks")
 public class Task implements HasId {
