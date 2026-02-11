@@ -16,6 +16,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.*;
@@ -23,9 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TaskController.class)
@@ -48,6 +50,28 @@ public class TaskControllerTest {
     private TaskRepository taskRepository;
 
     ArgumentCaptor<TaskPatchRequestDto> taskDtoCaptor = ArgumentCaptor.forClass(TaskPatchRequestDto.class);
+
+    @Test
+    @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
+    void shouldGetAllTasks() throws Exception {
+        List<TaskResponseDto> tasks = List.of(
+                new TaskResponseDto("1", "Task 1", "description 1", null, null, null, null, null, null),
+                new TaskResponseDto("2", "Task 2", "description 2", null, null, null, null, null, null)
+        );
+
+        when(taskService.getAllTasks()).thenReturn(tasks);
+
+        mockMvc.perform(get("/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("test-user").roles("USER"))
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].title").value("Task 1"))
+                .andExpect(jsonPath("$[1].title").value("Task 2"));
+
+    }
 
     @Test
     @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
