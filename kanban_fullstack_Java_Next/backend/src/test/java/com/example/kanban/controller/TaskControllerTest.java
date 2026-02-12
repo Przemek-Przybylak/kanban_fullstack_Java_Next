@@ -130,4 +130,18 @@ public class TaskControllerTest {
 
         verify(taskService, times(1)).deleteTask(eq(taskId), eq("test-user"));
     }
+
+    @Test
+    void shouldReturn404WhenTaskNotFound() throws Exception {
+        String taskId = "999";
+
+        doThrow(new NotFoundException("task", "id: " + taskId))
+                .when(taskService).deleteTask(eq(taskId), anyString());
+
+        mockMvc.perform(delete("/tasks/{id}", taskId)
+                        .with(user("test-user"))
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
