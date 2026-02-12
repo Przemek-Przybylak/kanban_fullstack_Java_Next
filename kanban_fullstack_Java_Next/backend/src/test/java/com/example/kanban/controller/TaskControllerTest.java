@@ -2,6 +2,7 @@ package com.example.kanban.controller;
 
 import com.example.kanban.DTO.TaskPatchRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.service.TaskService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,8 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -70,7 +71,6 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].title").value("Task 1"))
                 .andExpect(jsonPath("$[1].title").value("Task 2"));
-
     }
 
     @Test
@@ -117,5 +117,17 @@ public class TaskControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldDeleteTask() throws Exception {
+        String taskId = "123";
+
+        mockMvc.perform(delete("/tasks/{id}", taskId)
+                .with(user("test-user").roles("USER", "ADMIN"))
+                .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        verify(taskService, times(1)).deleteTask(eq(taskId), eq("test-user"));
     }
 }
