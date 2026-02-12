@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TaskController.class)
 @AutoConfigureMockMvc
+@WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
 public class TaskControllerTest {
 
     @Autowired
@@ -52,7 +53,6 @@ public class TaskControllerTest {
     ArgumentCaptor<TaskPatchRequestDto> taskDtoCaptor = ArgumentCaptor.forClass(TaskPatchRequestDto.class);
 
     @Test
-    @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
     void shouldGetAllTasks() throws Exception {
         List<TaskResponseDto> tasks = List.of(
                 new TaskResponseDto("1", "Task 1", "description 1", null, null, null, null, null, null),
@@ -74,7 +74,6 @@ public class TaskControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
     void shouldUpdateTaskPartially() throws Exception {
         String taskId = "123";
 
@@ -99,7 +98,6 @@ public class TaskControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
     void shouldUpdateTask() throws Exception {
         String taskId = "123";
 
