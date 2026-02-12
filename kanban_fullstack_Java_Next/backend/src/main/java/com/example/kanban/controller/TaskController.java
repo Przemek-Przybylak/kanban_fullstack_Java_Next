@@ -27,12 +27,6 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> getTask(@PathVariable String id) {
-
-        return ResponseEntity.ok(taskService.getTask(id));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDto> editTask(@PathVariable String id, @Validated(OnUpdate.class) @RequestBody TaskRequestDto taskDto, Authentication authentication) {
 
