@@ -17,9 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -101,18 +104,7 @@ public class TaskControllerTest {
 
     @Test
     void shouldReturn404WhenPatchingNonExistentTask() throws Exception {
-        String taskId = "non-exist";
-        TaskRequestDto request = new TaskRequestDto("new title", "description", null, null, null, null, "");
-
-        when(taskService.editPartialTask(eq(taskId), any(), anyString()))
-                .thenThrow(new NotFoundException("task", "id: " + taskId));
-
-        mockMvc.perform(patch("/tasks/{id}", taskId)
-                        .with(user("admin").roles("ADMIN"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+        return404WhenUpdatedTaskNoExist(MockMvcRequestBuilders::patch);
     }
 
     @Test
@@ -138,6 +130,11 @@ public class TaskControllerTest {
     }
 
     @Test
+    void shouldReturn404WhenPutNonExistentTask() throws Exception {
+        return404WhenUpdatedTaskNoExist(MockMvcRequestBuilders::put);
+    }
+
+    @Test
     void shouldDeleteTask() throws Exception {
         String taskId = "123";
 
@@ -160,6 +157,21 @@ public class TaskControllerTest {
                         .with(user("test-user"))
                         .with(csrf()))
                 .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    private void return404WhenUpdatedTaskNoExist(Function<String, MockHttpServletRequestBuilder> methodBuilder) throws Exception {
+        String taskId = "non-exist";
+        TaskRequestDto request = new TaskRequestDto("new title", "description", null, null, null, null, "");
+
+        when(taskService.editPartialTask(eq(taskId), any(), anyString()))
+                .thenThrow(new NotFoundException("task", "id: " + taskId));
+
+        mockMvc.perform(patch("/tasks/{id}", taskId)
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
     }
 }
