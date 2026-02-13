@@ -1,6 +1,7 @@
 package com.example.kanban.controller;
 
 import com.example.kanban.DTO.TaskPatchRequestDto;
+import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.ProjectRepository;
@@ -13,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private TaskService taskService;
@@ -93,8 +97,22 @@ public class TaskControllerTest {
 
         assertNull(captured.description());
         assertEquals("New task", captured.title());
+    }
 
+    @Test
+    void shouldReturn404WhenPatchingNonExistentTask() throws Exception {
+        String taskId = "non-exist";
+        TaskRequestDto request = new TaskRequestDto("new title", "description", null, null, null, null, "");
 
+        when(taskService.editPartialTask(eq(taskId), any(), anyString()))
+                .thenThrow(new NotFoundException("task", "id: " + taskId));
+
+        mockMvc.perform(patch("/tasks/{id}", taskId)
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -124,15 +142,15 @@ public class TaskControllerTest {
         String taskId = "123";
 
         mockMvc.perform(delete("/tasks/{id}", taskId)
-                .with(user("test-user").roles("USER", "ADMIN"))
-                .with(csrf()))
+                        .with(user("test-user").roles("USER", "ADMIN"))
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(taskService, times(1)).deleteTask(eq(taskId), eq("test-user"));
     }
 
     @Test
-    void shouldReturn404WhenTaskNotFound() throws Exception {
+    void shouldReturn404WhenDeletingNonExistingTask() throws Exception {
         String taskId = "999";
 
         doThrow(new NotFoundException("task", "id: " + taskId))
