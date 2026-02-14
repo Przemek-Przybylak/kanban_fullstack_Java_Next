@@ -3,6 +3,7 @@ package com.example.kanban.controller;
 import com.example.kanban.DTO.TaskPatchRequestDto;
 import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
+import com.example.kanban.exception.IllegalRoleChangeException;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
@@ -87,7 +88,7 @@ public class TaskControllerTest {
         when(taskService.editPartialTask(anyString(), any(), anyString()))
                 .thenReturn(new TaskResponseDto(taskId, "New task", "Description", null, null, null, null, null, null));
 
-        mockMvc.perform(patch("/tasks/123", taskId)
+        mockMvc.perform(patch("/tasks/{id}", taskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\": \"New task\"}")
                         .with(user("test-user").roles("USER"))
@@ -114,19 +115,35 @@ public class TaskControllerTest {
         when(taskService.editTask(anyString(), any(), anyString()))
                 .thenReturn(new TaskResponseDto(taskId, "New task", "Description", null, null, null, null, null, null));
 
-        mockMvc.perform(put("/tasks/123", taskId)
+        mockMvc.perform(put("/tasks/{id}", taskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                     "title": "New task",
                                     "description": "Some description",
-                                    "status": "TODO" 
+                                    "status": "TODO"
                                 }
                                 """)
                         .with(user("test-user").roles("USER"))
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn400WhenPutTaskTitleIsBlank() throws Exception {
+        String taskId = "123";
+        TaskRequestDto request = new TaskRequestDto("", "description", "todo", null, null, null, null);
+
+        when(taskService.editTask(eq(taskId), any(), anyString()))
+                .thenThrow(new IllegalRoleChangeException("Title cannot be empty"));
+
+        mockMvc.perform(put("/tasks/{id}", taskId)
+                .with(user("admin").roles("ADMIN"))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
