@@ -162,12 +162,16 @@ public class TaskControllerTest {
 
     private void return404WhenUpdatedTaskNoExist(Function<String, MockHttpServletRequestBuilder> methodBuilder) throws Exception {
         String taskId = "non-exist";
-        TaskRequestDto request = new TaskRequestDto("new title", "description", null, null, null, null, "");
+        String fullPath = "/tasks/" + taskId;
+        TaskRequestDto request = new TaskRequestDto("new title", "description", "todo", null, null, null, "");
 
         when(taskService.editPartialTask(eq(taskId), any(), anyString()))
                 .thenThrow(new NotFoundException("task", "id: " + taskId));
 
-        mockMvc.perform(patch("/tasks/{id}", taskId)
+        when(taskService.editTask(eq(taskId), any(), anyString()))
+                .thenThrow(new NotFoundException("task", "id: " + taskId));
+
+        mockMvc.perform(methodBuilder.apply(fullPath)
                         .with(user("admin").roles("ADMIN"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
