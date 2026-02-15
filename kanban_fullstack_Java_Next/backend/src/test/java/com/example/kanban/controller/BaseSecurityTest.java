@@ -23,7 +23,13 @@ public abstract class BaseSecurityTest {
                 .with(user("intruder").roles("Guest"))
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
+                .content("""
+                                {
+                                    "title": "New task",
+                                    "description": "Some description",
+                                    "status": "TODO"
+                                }
+                                """))
                 .andExpect(status().isForbidden());
     }
 }
