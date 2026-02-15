@@ -3,6 +3,7 @@ package com.example.kanban.controller;
 import com.example.kanban.DTO.TaskPatchRequestDto;
 import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
+import com.example.kanban.exception.ForbiddenException;
 import com.example.kanban.exception.IllegalRoleChangeException;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.ProjectRepository;
@@ -10,6 +11,8 @@ import com.example.kanban.model.TaskRepository;
 import com.example.kanban.service.TaskService;
 import com.example.kanban.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -24,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -39,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaskController.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
-public class TaskControllerTest {
+public class TaskControllerTest extends BaseSecurityTest{
 
     @Autowired
     private MockMvc mockMvc;
@@ -175,6 +179,29 @@ public class TaskControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @MethodSource("taskSecurityEndpoints")
+    void shouldReturn403ForTaskEndpoints(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+
+        doThrow(new ForbiddenException("task"))
+                .when(taskService).editTask(anyString(), any(), anyString());
+
+        doThrow(new ForbiddenException("task"))
+                .when(taskService).editPartialTask(anyString(), any(), anyString());
+
+        doThrow(new ForbiddenException("task"))
+                .when(taskService).deleteTask(anyString(), anyString());
+        performSecurityCheck(requestBuilder);
+    }
+
+    static Stream<MockHttpServletRequestBuilder> taskSecurityEndpoints() {
+        return Stream.of(
+                put("/tasks/123"),
+                patch("/tasks/123"),
+                delete("/tasks/123")
+        );
     }
 
     private void return404WhenUpdatedTaskNoExist(Function<String, MockHttpServletRequestBuilder> methodBuilder) throws Exception {
