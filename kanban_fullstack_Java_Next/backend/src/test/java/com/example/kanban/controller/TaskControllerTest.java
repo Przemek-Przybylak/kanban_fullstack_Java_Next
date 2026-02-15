@@ -22,11 +22,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaskController.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "test-user", roles = {"USER", "ADMIN"})
-public class TaskControllerTest extends BaseSecurityTest{
+public class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -108,11 +106,6 @@ public class TaskControllerTest extends BaseSecurityTest{
     }
 
     @Test
-    void shouldReturn404WhenPatchingNonExistentTask() throws Exception {
-        return404WhenUpdatedTaskNoExist(MockMvcRequestBuilders::patch);
-    }
-
-    @Test
     void shouldUpdateTask() throws Exception {
         String taskId = "123";
 
@@ -143,16 +136,11 @@ public class TaskControllerTest extends BaseSecurityTest{
                 .thenThrow(new IllegalRoleChangeException("Title cannot be empty"));
 
         mockMvc.perform(put("/tasks/{id}", taskId)
-                .with(user("admin").roles("ADMIN"))
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void shouldReturn404WhenPutNonExistentTask() throws Exception {
-        return404WhenUpdatedTaskNoExist(MockMvcRequestBuilders::put);
     }
 
     @Test
@@ -183,8 +171,7 @@ public class TaskControllerTest extends BaseSecurityTest{
 
     @ParameterizedTest
     @MethodSource("taskSecurityEndpoints")
-    void shouldReturn403ForTaskEndpoints(MockHttpServletRequestBuilder requestBuilder) throws Exception {
-
+    void shouldReturn403ForTaskEndpoints(MockHttpServletRequestBuilder methodBuilder) throws Exception {
         doThrow(new ForbiddenException("task"))
                 .when(taskService).editTask(anyString(), any(), anyString());
 
@@ -193,7 +180,51 @@ public class TaskControllerTest extends BaseSecurityTest{
 
         doThrow(new ForbiddenException("task"))
                 .when(taskService).deleteTask(anyString(), anyString());
-        performSecurityCheck(requestBuilder);
+
+        mockMvc.perform(methodBuilder
+                        .with(user("intruder").roles("Guest"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "title": "New task",
+                                    "description": "Some description",
+                                    "status": "TODO"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @MethodSource("taskSecurityEndpoints")
+    void return404WhenUpdatedTaskNoExist(MockHttpServletRequestBuilder methodBuilder) throws Exception {
+        String taskId = "123";
+        String fullPath = "/tasks/" + taskId;
+        TaskRequestDto request = new TaskRequestDto("new title", "description", "todo", null, null, null, "");
+
+
+        doThrow(new NotFoundException("task", "id: " + taskId))
+                .when(taskService).editTask(eq(taskId), any(), any());
+
+        doThrow(new NotFoundException("task", "id: " + taskId))
+                .when(taskService).editPartialTask(eq(taskId), any(), any());
+
+        doThrow(new NotFoundException("task", "id: " + taskId))
+                .when(taskService).deleteTask(eq(taskId), any());
+
+
+        mockMvc.perform(methodBuilder
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "title": "New task",
+                                    "description": "Some description",
+                                    "status": "TODO"
+                                }
+                                """))
+                .andExpect(status().isNotFound());
     }
 
     static Stream<MockHttpServletRequestBuilder> taskSecurityEndpoints() {
@@ -202,24 +233,5 @@ public class TaskControllerTest extends BaseSecurityTest{
                 patch("/tasks/123"),
                 delete("/tasks/123")
         );
-    }
-
-    private void return404WhenUpdatedTaskNoExist(Function<String, MockHttpServletRequestBuilder> methodBuilder) throws Exception {
-        String taskId = "non-exist";
-        String fullPath = "/tasks/" + taskId;
-        TaskRequestDto request = new TaskRequestDto("new title", "description", "todo", null, null, null, "");
-
-        when(taskService.editPartialTask(eq(taskId), any(), anyString()))
-                .thenThrow(new NotFoundException("task", "id: " + taskId));
-
-        when(taskService.editTask(eq(taskId), any(), anyString()))
-                .thenThrow(new NotFoundException("task", "id: " + taskId));
-
-        mockMvc.perform(methodBuilder.apply(fullPath)
-                        .with(user("admin").roles("ADMIN"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
     }
 }
