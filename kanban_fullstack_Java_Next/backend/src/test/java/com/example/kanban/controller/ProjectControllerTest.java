@@ -38,7 +38,7 @@ public class ProjectControllerTest {
     private TaskRepository taskRepository;
 
     @Test
-    void shouldGetAllProjects() throws Exception{
+    void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
                 new ProjectResponseDto("1", "title 1", "description 1", null,null,null,null),
                 new ProjectResponseDto("2", "title 2", "description 2", null,null,null,null)
@@ -53,5 +53,19 @@ public class ProjectControllerTest {
                 .andExpect(jsonPath("$.size()").value(2))
                         .andExpect(jsonPath("$[0].title").value("title 1"))
                         .andExpect(jsonPath("$[1].title").value("title 2"));
+    }
+
+    @Test
+    void shouldGetProject() throws Exception {
+        ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null,null,null,null);
+
+        when(projectService.getProject(project.id())).thenReturn(project);
+
+        mockMvc.perform(get("/projects/{id}", project.id())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value("1"))
+                .andExpect(jsonPath("title").value("title 1"));
     }
 }
