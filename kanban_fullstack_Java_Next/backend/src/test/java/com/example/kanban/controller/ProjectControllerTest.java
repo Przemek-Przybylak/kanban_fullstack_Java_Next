@@ -1,6 +1,7 @@
 package com.example.kanban.controller;
 
 import com.example.kanban.DTO.ProjectResponseDto;
+import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.DTO.shortProjectDto;
 import com.example.kanban.model.ProjectRepository;
@@ -13,20 +14,29 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProjectController.class)
 public class ProjectControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private ProjectService projectService;
@@ -88,5 +98,26 @@ public class ProjectControllerTest {
                 .andExpect(jsonPath("$.size()").value(1))
                 .andExpect(jsonPath("$[0].id").value("1"))
                 .andExpect(jsonPath("$[0].title").value("title 1"));
+    }
+
+    @Test
+    void shouldAddTask() throws Exception {
+        shortProjectDto project = new shortProjectDto("1.1", "title 1.1");
+        String projectId = "1.1";
+        TaskRequestDto task = new TaskRequestDto("title 1", "description 1", "TODO", null, null, "admin", "1.1");
+        TaskResponseDto addedTask = new TaskResponseDto("1.1", "title 2", "description 2", "TODO", null, null, null, project, "admin");
+
+        when(projectService.addTask(eq(projectId), any(TaskRequestDto.class), eq("admin")))
+                .thenReturn(addedTask);
+
+        mockMvc.perform(post("/projects/{id}/tasks", projectId)
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(addedTask)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString("/1.1"))) // Sprawdza URI
+                .andExpect(jsonPath("$.id").value("1.1"))
+                .andExpect(jsonPath("$.title").value("title 2"));
     }
 }
