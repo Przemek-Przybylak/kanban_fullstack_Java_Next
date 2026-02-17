@@ -1,12 +1,10 @@
 package com.example.kanban.controller;
 
-import com.example.kanban.DTO.ProjectResponseDto;
-import com.example.kanban.DTO.TaskRequestDto;
-import com.example.kanban.DTO.TaskResponseDto;
-import com.example.kanban.DTO.shortProjectDto;
+import com.example.kanban.DTO.*;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.service.ProjectService;
+import com.example.kanban.service.TaskService;
 import com.example.kanban.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +19,11 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,6 +47,9 @@ public class ProjectControllerTest {
 
     @MockitoBean
     private TaskRepository taskRepository;
+
+    @MockitoBean
+    private TaskService taskService;
 
     @Test
     void shouldGetAllProjects() throws Exception {
@@ -116,8 +117,24 @@ public class ProjectControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(addedTask)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/1.1"))) // Sprawdza URI
+                .andExpect(header().string("Location", containsString("/1.1")))
                 .andExpect(jsonPath("$.id").value("1.1"))
                 .andExpect(jsonPath("$.title").value("title 2"));
+    }
+
+    @Test
+    void shouldUpdateStatus() throws Exception {
+        String status = "done";
+        String taskId = "1";
+        TaskStatusRequest request = new TaskStatusRequest(status);
+
+        mockMvc.perform(patch("/projects/{taskId}/tasks", taskId)
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(taskService).updateStatus(eq(taskId), eq(status));
     }
 }
