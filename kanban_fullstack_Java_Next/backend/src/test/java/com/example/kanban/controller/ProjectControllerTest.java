@@ -137,4 +137,25 @@ public class ProjectControllerTest {
 
         verify(taskService).updateStatus(eq(taskId), eq(status));
     }
+
+    @Test
+    void shouldAddProject() throws Exception {
+        String username = "admin";
+        ProjectRequestDto project = new ProjectRequestDto("title 1", "description 1");
+
+        ProjectResponseDto savedProject = new ProjectResponseDto("100", "title 1", "description 1", null, null, null, null);
+
+        when(projectService.addProject(any(ProjectRequestDto.class), eq(username)))
+                .thenReturn(savedProject);
+
+        mockMvc.perform(post("/projects")
+                        .with(csrf())
+                        .with(user(username))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(project)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString("/projects/100")))
+                .andExpect(jsonPath("$.id").value("100"))
+                .andExpect(jsonPath("$.title").value("title 1"));
+    }
 }
