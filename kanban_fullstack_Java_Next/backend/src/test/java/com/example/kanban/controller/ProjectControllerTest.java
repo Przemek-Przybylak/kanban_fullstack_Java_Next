@@ -53,12 +53,13 @@ public class ProjectControllerTest {
 
     String id = "2";
     String username = "admin";
+    ProjectResponseDto savedProject = new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null);
 
     @Test
     void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
                 new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null),
-                new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null)
+                savedProject
         );
 
         when(projectService.getAllProjects()).thenReturn(projects);
@@ -164,7 +165,6 @@ public class ProjectControllerTest {
     @Test
     void shouldUpdateProject() throws Exception {
         ProjectRequestDto addedProject = new ProjectRequestDto("title", "description");
-        ProjectResponseDto savedProject = new ProjectResponseDto("2", "title", "description", null, null, null, null);
 
         when(projectService.editProject(eq(id), any(ProjectRequestDto.class), eq(username)))
                 .thenReturn(savedProject);
@@ -180,6 +180,17 @@ public class ProjectControllerTest {
 
     @Test
     void shouldUpdateProjectPartially() throws Exception {
+        ProjectPatchRequestDto addedProject = new ProjectPatchRequestDto("", "description");
 
+        when(projectService.editPartialProject(eq(id), any(ProjectPatchRequestDto.class), eq(username)))
+                .thenReturn(savedProject);
+
+        mockMvc.perform(patch("/projects/{id}", id)
+                        .with(csrf())
+                        .with(user(username))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(addedProject)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("2"));
     }
 }
