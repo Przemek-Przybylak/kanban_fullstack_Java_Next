@@ -51,6 +51,9 @@ public class ProjectControllerTest {
     @MockitoBean
     private TaskService taskService;
 
+    String id = "2";
+    String username = "admin";
+
     @Test
     void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
@@ -140,7 +143,6 @@ public class ProjectControllerTest {
 
     @Test
     void shouldAddProject() throws Exception {
-        String username = "admin";
         ProjectRequestDto project = new ProjectRequestDto("title 1", "description 1");
 
         ProjectResponseDto savedProject = new ProjectResponseDto("100", "title 1", "description 1", null, null, null, null);
@@ -161,8 +163,6 @@ public class ProjectControllerTest {
 
     @Test
     void shouldUpdateProject() throws Exception {
-        String id = "2";
-        String username = "admin";
         ProjectRequestDto addedProject = new ProjectRequestDto("title", "description");
         ProjectResponseDto savedProject = new ProjectResponseDto("2", "title", "description", null, null, null, null);
 
@@ -176,5 +176,10 @@ public class ProjectControllerTest {
                         .content(objectMapper.writeValueAsString(addedProject)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("2"));
+    }
+
+    @Test
+    void shouldUpdateProjectPartially() throws Exception {
+
     }
 }
