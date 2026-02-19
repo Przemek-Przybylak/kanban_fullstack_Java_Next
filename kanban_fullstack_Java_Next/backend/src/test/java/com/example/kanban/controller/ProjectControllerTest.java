@@ -19,8 +19,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -192,5 +191,16 @@ public class ProjectControllerTest {
                         .content(objectMapper.writeValueAsString(addedProject)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("2"));
+    }
+
+    @Test
+    void shouldDeleteProject() throws Exception {
+        mockMvc.perform(delete("/projects/{id}", id)
+                        .with(csrf())
+                        .with(user(username)))
+                .andExpect(status().isNoContent());
+
+        verify(projectService, times(1)).deleteProject(eq(id));
+
     }
 }
