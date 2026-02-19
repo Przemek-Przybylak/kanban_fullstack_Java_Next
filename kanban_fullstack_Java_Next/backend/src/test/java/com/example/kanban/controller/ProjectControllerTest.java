@@ -159,5 +159,22 @@ public class ProjectControllerTest {
                 .andExpect(jsonPath("$.title").value("title 1"));
     }
 
+    @Test
+    void shouldUpdateProject() throws Exception {
+        String id = "2";
+        String username = "admin";
+        ProjectRequestDto addedProject = new ProjectRequestDto("title", "description");
+        ProjectResponseDto savedProject = new ProjectResponseDto("2", "title", "description", null, null, null, null);
 
+        when(projectService.editProject(eq(id), any(ProjectRequestDto.class), eq(username)))
+                .thenReturn(savedProject);
+
+        mockMvc.perform(put("/projects/{id}", id)
+                        .with(csrf())
+                        .with(user(username))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(addedProject)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("2"));
+    }
 }
