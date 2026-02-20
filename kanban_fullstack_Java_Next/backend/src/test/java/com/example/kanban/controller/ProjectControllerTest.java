@@ -53,11 +53,12 @@ public class ProjectControllerTest {
     String id = "2";
     String username = "admin";
     ProjectResponseDto savedProject = new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null);
+    ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null);
 
     @Test
     void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
-                new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null),
+                project,
                 savedProject
         );
 
@@ -74,7 +75,6 @@ public class ProjectControllerTest {
 
     @Test
     void shouldGetProject() throws Exception {
-        ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null);
 
         when(projectService.getProject(project.id())).thenReturn(project);
 
