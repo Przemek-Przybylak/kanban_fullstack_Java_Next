@@ -54,7 +54,7 @@ public class ProjectControllerTest {
     String username = "admin";
     ProjectResponseDto savedProject = new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null);
     ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null);
-
+    shortProjectDto projectShort = new shortProjectDto("1.1", "title 1.1");
     @Test
     void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
@@ -88,9 +88,9 @@ public class ProjectControllerTest {
 
     @Test
     void shouldGetTasksByProject() throws Exception {
-        shortProjectDto project = new shortProjectDto("1.1", "title 1.1");
+
         List<TaskResponseDto> tasks = List.of(
-                new TaskResponseDto("1", "title 1", "description 1", "TODO", null, null, null, project, "admin")
+                new TaskResponseDto("1", "title 1", "description 1", "TODO", null, null, null, projectShort, "admin")
         );
 
         when(projectService.getTasksByProject(project.id())).thenReturn(tasks);
@@ -106,10 +106,10 @@ public class ProjectControllerTest {
 
     @Test
     void shouldAddTask() throws Exception {
-        shortProjectDto project = new shortProjectDto("1.1", "title 1.1");
+
         String projectId = "1.1";
         TaskRequestDto task = new TaskRequestDto("title 1", "description 1", "TODO", null, null, "admin", "1.1");
-        TaskResponseDto addedTask = new TaskResponseDto("1.1", "title 2", "description 2", "TODO", null, null, null, project, "admin");
+        TaskResponseDto addedTask = new TaskResponseDto("1.1", "title 2", "description 2", "TODO", null, null, null, projectShort, "admin");
 
         when(projectService.addTask(eq(projectId), any(TaskRequestDto.class), eq("admin")))
                 .thenReturn(addedTask);
