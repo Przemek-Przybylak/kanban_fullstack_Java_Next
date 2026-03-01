@@ -7,14 +7,18 @@ import com.example.kanban.service.ProjectService;
 import com.example.kanban.service.TaskService;
 import com.example.kanban.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -202,5 +206,20 @@ public class ProjectControllerTest {
 
         verify(projectService, times(1)).deleteProject(eq(id));
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("projectSecurityEndpoints")
+
+
+    static Stream<MockHttpServletRequestBuilder> projectSecurityEndpoints() {
+        return Stream.of(
+                post("/projects"),
+                post("/projects/{id}/tasks"),
+                put("projects/123"),
+                patch("projects/123"),
+                patch("/projects/{taskId}/tasks"),
+                delete("projects/123")
+        );
     }
 }
