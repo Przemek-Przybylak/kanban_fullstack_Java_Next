@@ -1,6 +1,7 @@
 package com.example.kanban.controller;
 
 import com.example.kanban.DTO.*;
+import com.example.kanban.exception.ForbiddenException;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.service.ProjectService;
@@ -210,6 +211,10 @@ public class ProjectControllerTest {
 
     @ParameterizedTest
     @MethodSource("projectSecurityEndpoints")
+    void shouldReturn403ForTasEndpoints(MockHttpServletRequestBuilder methodBuilder) throws Exception {
+        doThrow(new ForbiddenException("project"))
+                .when(projectService.editProject(anyString(),any(),anyString()));
+    }
 
 
     static Stream<MockHttpServletRequestBuilder> projectSecurityEndpoints() {
