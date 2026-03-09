@@ -213,18 +213,41 @@ public class ProjectControllerTest {
     @MethodSource("projectSecurityEndpoints")
     void shouldReturn403ForTasEndpoints(MockHttpServletRequestBuilder methodBuilder) throws Exception {
         doThrow(new ForbiddenException("project"))
-                .when(projectService.editProject(anyString(),any(),anyString()));
-    }
+                .when(projectService).addProject(any(), anyString());
 
+        doThrow(new ForbiddenException("task"))
+                .when(projectService).addTask(anyString(), any(), anyString());
+
+        doThrow(new ForbiddenException("project"))
+                .when(projectService).editProject(anyString(), any(), anyString());
+
+        doThrow(new ForbiddenException("project"))
+                .when(projectService).editPartialProject(anyString(), any(), anyString());
+
+        doThrow(new ForbiddenException("project"))
+                .when(projectService).deleteProject(anyString());
+
+        mockMvc.perform(methodBuilder
+                        .with(user("intruder").roles("Guest"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                    {
+                        "title": "New task",
+                        "description": "Some description",
+                        "status": "TODO"
+                    }
+                    """))
+                .andExpect(status().isForbidden());
+    }
 
     static Stream<MockHttpServletRequestBuilder> projectSecurityEndpoints() {
         return Stream.of(
                 post("/projects"),
-                post("/projects/{id}/tasks"),
-                put("projects/123"),
-                patch("projects/123"),
-                patch("/projects/{taskId}/tasks"),
-                delete("projects/123")
+                post("/projects/{id}/tasks", 1),
+                put("/projects/123"),
+                patch("/projects/123"),
+                delete("/projects/123")
         );
     }
 }
