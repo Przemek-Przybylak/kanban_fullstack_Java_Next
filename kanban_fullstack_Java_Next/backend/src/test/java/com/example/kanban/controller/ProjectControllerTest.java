@@ -2,6 +2,7 @@ package com.example.kanban.controller;
 
 import com.example.kanban.DTO.*;
 import com.example.kanban.exception.ForbiddenException;
+import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.service.ProjectService;
@@ -239,6 +240,38 @@ public class ProjectControllerTest {
                     }
                     """))
                 .andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @MethodSource("projectSecurityEndpoints")
+    void return404WhenUpdatedProjectNoExist(MockHttpServletRequestBuilder methodBuilder) throws Exception {
+        String projectId = "123";
+        String fullPath = "/projects/" + projectId;
+        ProjectRequestDto request = new ProjectRequestDto("new title", "description");
+
+
+        doThrow(new NotFoundException("project", "id" + projectId))
+                .when(projectService).editProject(eq(projectId), any(), any());
+
+        doThrow(new NotFoundException("project", "id" + projectId))
+                .when(projectService).editPartialProject(eq(projectId), any(), any());
+
+        doThrow(new NotFoundException("project", "id" + projectId))
+                .when(projectService).deleteProject(eq(projectId));
+
+
+        mockMvc.perform(methodBuilder
+                .with(user("admin").roles("ADMIN"))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "title": "New project",
+                            "description": "Some description",
+                            "status": "TODO"
+                        }
+                        """))
+                .andExpect(status().isNotFound());
     }
 
     static Stream<MockHttpServletRequestBuilder> projectSecurityEndpoints() {
