@@ -61,6 +61,7 @@ public class ProjectControllerTest {
     ProjectResponseDto savedProject = new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null);
     ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null);
     shortProjectDto projectShort = new shortProjectDto("1.1", "title 1.1");
+
     @Test
     void shouldGetAllProjects() throws Exception {
         List<ProjectResponseDto> projects = List.of(
@@ -211,7 +212,7 @@ public class ProjectControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("projectSecurityEndpoints")
+    @MethodSource("projectSecurityEndpointsFor403")
     void shouldReturn403ForTasEndpoints(MockHttpServletRequestBuilder methodBuilder) throws Exception {
         doThrow(new ForbiddenException("project"))
                 .when(projectService).addProject(any(), anyString());
@@ -233,17 +234,17 @@ public class ProjectControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                    {
-                        "title": "New task",
-                        "description": "Some description",
-                        "status": "TODO"
-                    }
-                    """))
+                                {
+                                    "title": "New task",
+                                    "description": "Some description",
+                                    "status": "TODO"
+                                }
+                                """))
                 .andExpect(status().isForbidden());
     }
 
     @ParameterizedTest
-    @MethodSource("projectSecurityEndpoints")
+    @MethodSource("projectSecurityEndpointsFor404")
     void return404WhenUpdatedProjectNoExist(MockHttpServletRequestBuilder methodBuilder) throws Exception {
         String projectId = "123";
         String fullPath = "/projects/" + projectId;
@@ -261,23 +262,31 @@ public class ProjectControllerTest {
 
 
         mockMvc.perform(methodBuilder
-                .with(user("admin").roles("ADMIN"))
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "title": "New project",
-                            "description": "Some description",
-                            "status": "TODO"
-                        }
-                        """))
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "title": "New project",
+                                    "description": "Some description",
+                                    "status": "TODO"
+                                }
+                                """))
                 .andExpect(status().isNotFound());
     }
 
-    static Stream<MockHttpServletRequestBuilder> projectSecurityEndpoints() {
+    static Stream<MockHttpServletRequestBuilder> projectSecurityEndpointsFor403() {
         return Stream.of(
                 post("/projects"),
                 post("/projects/{id}/tasks", 1),
+                put("/projects/123"),
+                patch("/projects/123"),
+                delete("/projects/123")
+        );
+    }
+
+    static Stream<MockHttpServletRequestBuilder> projectSecurityEndpointsFor404() {
+        return Stream.of(
                 put("/projects/123"),
                 patch("/projects/123"),
                 delete("/projects/123")
