@@ -56,11 +56,20 @@ public class ProjectControllerTest {
     @MockitoBean
     private TaskService taskService;
 
-    String id = "2";
+    static String id = "2";
+    static String projectPath = "/projects/" + id;
     String username = "admin";
     ProjectResponseDto savedProject = new ProjectResponseDto("2", "title 2", "description 2", null, null, null, null);
     ProjectResponseDto project = new ProjectResponseDto("1", "title 1", "description 1", null, null, null, null);
     shortProjectDto projectShort = new shortProjectDto("1.1", "title 1.1");
+    String changedProjectContent =
+            """
+                    {
+                        "title": "New project",
+                        "description": "Some description",
+                        "status": "TODO"
+                    }
+                    """;
 
     @Test
     void shouldGetAllProjects() throws Exception {
@@ -233,45 +242,29 @@ public class ProjectControllerTest {
                         .with(user("intruder").roles("Guest"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "title": "New task",
-                                    "description": "Some description",
-                                    "status": "TODO"
-                                }
-                                """))
+                        .content(changedProjectContent))
                 .andExpect(status().isForbidden());
     }
 
     @ParameterizedTest
     @MethodSource("projectSecurityEndpointsFor404")
     void return404WhenUpdatedProjectNoExist(MockHttpServletRequestBuilder methodBuilder) throws Exception {
-        String projectId = "123";
-        String fullPath = "/projects/" + projectId;
-        ProjectRequestDto request = new ProjectRequestDto("new title", "description");
 
+        doThrow(new NotFoundException("project", "id" + id))
+                .when(projectService).editProject(eq(id), any(), any());
 
-        doThrow(new NotFoundException("project", "id" + projectId))
-                .when(projectService).editProject(eq(projectId), any(), any());
+        doThrow(new NotFoundException("project", "id" + id))
+                .when(projectService).editPartialProject(eq(id), any(), any());
 
-        doThrow(new NotFoundException("project", "id" + projectId))
-                .when(projectService).editPartialProject(eq(projectId), any(), any());
-
-        doThrow(new NotFoundException("project", "id" + projectId))
-                .when(projectService).deleteProject(eq(projectId));
+        doThrow(new NotFoundException("project", "id" + id))
+                .when(projectService).deleteProject(eq(id));
 
 
         mockMvc.perform(methodBuilder
                         .with(user("admin").roles("ADMIN"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "title": "New project",
-                                    "description": "Some description",
-                                    "status": "TODO"
-                                }
-                                """))
+                        .content(changedProjectContent))
                 .andExpect(status().isNotFound());
     }
 
@@ -279,17 +272,17 @@ public class ProjectControllerTest {
         return Stream.of(
                 post("/projects"),
                 post("/projects/{id}/tasks", 1),
-                put("/projects/123"),
-                patch("/projects/123"),
-                delete("/projects/123")
+                put(projectPath),
+                patch(projectPath),
+                delete(projectPath)
         );
     }
 
     static Stream<MockHttpServletRequestBuilder> projectSecurityEndpointsFor404() {
         return Stream.of(
-                put("/projects/123"),
-                patch("/projects/123"),
-                delete("/projects/123")
+                put(projectPath),
+                patch(projectPath),
+                delete(projectPath)
         );
     }
 }
