@@ -1,4 +1,3 @@
-package com.example.kanban.user.controller;
 
 import com.example.kanban.auth.controller.AuthController;
 import com.example.kanban.model.ProjectRepository;
