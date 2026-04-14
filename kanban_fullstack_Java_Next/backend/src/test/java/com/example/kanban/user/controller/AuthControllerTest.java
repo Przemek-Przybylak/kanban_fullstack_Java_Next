@@ -2,22 +2,29 @@ package com.example.kanban.user.controller;
 
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
+import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
+import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
 public class AuthControllerTest {
@@ -40,12 +47,13 @@ public class AuthControllerTest {
     @MockitoBean
     private TaskRepository taskRepository;
 
+    UserResponseDto userResponseDto = new UserResponseDto("1", Role.USER, "user");
+
     @Test
     void shouldRegisterUserSuccessfully() {
         RegisterRequestDto request = new RegisterRequestDto("user", "user");
-        UserResponseDto response = new UserResponseDto("1", Role.USER, "user");
 
-        when(userService.register(request)).thenReturn(response);
+        when(userService.register(request)).thenReturn(userResponseDto);
 
         UserResponseDto result = userService.register(request);
 
@@ -53,6 +61,34 @@ public class AuthControllerTest {
         assertEquals("user", result.username());
         verify(userService, times(1)).register(any());
     }
+
+    @Test
+    void shouldLoginUserSuccessfully() throws Exception {
+        LoginRequestDto requestDto = new LoginRequestDto("user", "user");
+
+        String mockToken = "super-secret-jwt--token";
+        when(userService.loginAndReturnToken(any())).thenReturn(mockToken);
+
+        User mockUser = new User();
+        mockUser.setId("1");
+        mockUser.setUsername("user");
+        mockUser.setRole(Role.USER);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(mockUser));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("token"))
+                .andExpect(cookie().value("token", mockToken))
+                .andExpect(cookie().httpOnly("token", true))
+                .andExpect(cookie().secure("token", true))
+                .andExpect(cookie().maxAge("token", 3600)) // 60 * 60
+                .andExpect(jsonPath("$.username").value("user"))
+                .andExpect(jsonPath("$.id").value("1"));
+    }
+
+
 }
 
 
