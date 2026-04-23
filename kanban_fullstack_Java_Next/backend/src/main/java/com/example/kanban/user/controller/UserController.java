@@ -16,12 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-public class LoginController {
+public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
 
-    public LoginController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
     }
