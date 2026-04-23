@@ -1,3 +1,4 @@
+package com.example.kanban.auth.controller;
 
 import com.example.kanban.auth.controller.AuthController;
 import com.example.kanban.model.ProjectRepository;
@@ -6,7 +7,6 @@ import com.example.kanban.user.dto.LoginRequestDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
-import com.example.kanban.user.model.RoleUpdateRequest;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
@@ -24,7 +24,6 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
