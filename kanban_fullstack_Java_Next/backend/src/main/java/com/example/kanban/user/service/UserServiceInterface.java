@@ -1,6 +1,7 @@
 package com.example.kanban.user.service;
 
 import com.example.kanban.user.dto.LoginRequestDto;
+import com.example.kanban.user.dto.LoginResponseDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface UserServiceInterface {
     UserResponseDto register(final RegisterRequestDto requestDto);
 
-    String loginAndReturnToken(final LoginRequestDto requestDto);
+    LoginResponseDto loginAndReturnUserWithToken(final LoginRequestDto requestDto);
 
     User getUserById(final String id);
 
