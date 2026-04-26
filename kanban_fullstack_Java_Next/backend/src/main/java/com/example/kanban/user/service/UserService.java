@@ -5,6 +5,7 @@ import com.example.kanban.exception.IllegalRoleChangeException;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.exception.UnauthorizedException;
 import com.example.kanban.user.dto.LoginRequestDto;
+import com.example.kanban.user.dto.LoginResponseDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
@@ -13,13 +14,12 @@ import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserServiceInterface{
+public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -47,7 +47,7 @@ public class UserService implements UserServiceInterface{
         return new UserResponseDto(user.getId(), user.getRole(), user.getUsername());
     }
 
-    public String loginAndReturnToken(final LoginRequestDto requestDto) {
+    public LoginResponseDto loginAndReturnUserWithToken(final LoginRequestDto requestDto) {
         final var user = userRepository.findByUsername(requestDto.username())
                 .orElseThrow(
                         () -> new UnauthorizedException("username"));
@@ -56,7 +56,14 @@ public class UserService implements UserServiceInterface{
             throw new UnauthorizedException("password");
         }
 
-        return jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getUsername());
+
+        return new LoginResponseDto(
+                token,
+                user.getId(),
+                user.getRole(),
+                user.getUsername()
+        );
     }
 
     public User getUserById(final String id) {
