@@ -1,5 +1,6 @@
 package com.example.kanban.auth.controller;
 
+import com.example.kanban.exception.UnauthorizedException;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.dto.LoginRequestDto;
@@ -82,6 +83,19 @@ public class AuthControllerTest {
                 .andExpect(cookie().maxAge("token", 3600)) // 60 * 60
                 .andExpect(jsonPath("$.username").value("user"))
                 .andExpect(jsonPath("$.id").value("1"));
+    }
+
+    @Test
+    void return401WhenUserNotFound() throws Exception {
+        LoginRequestDto requestDto = new LoginRequestDto("unnown", "nevermind");
+
+        when(userService.loginAndReturnUserWithToken(any(LoginRequestDto.class)))
+                .thenThrow(new UnauthorizedException("Invalid credentials"));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isUnauthorized());
     }
 
     @ParameterizedTest
