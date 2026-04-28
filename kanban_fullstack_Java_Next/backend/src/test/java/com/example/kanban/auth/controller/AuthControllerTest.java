@@ -1,24 +1,23 @@
 package com.example.kanban.auth.controller;
 
-import com.example.kanban.auth.controller.AuthController;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.dto.LoginRequestDto;
+import com.example.kanban.user.dto.LoginResponseDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
-import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,13 +67,9 @@ public class AuthControllerTest {
         LoginRequestDto requestDto = new LoginRequestDto("user", "user");
 
         String mockToken = "super-secret-jwt--token";
-        when(userService.loginAndReturnToken(any())).thenReturn(mockToken);
 
-        User mockUser = new User();
-        mockUser.setId("1");
-        mockUser.setUsername("user");
-        mockUser.setRole(Role.USER);
-        when(userRepository.findByUsername("user")).thenReturn(Optional.of(mockUser));
+        LoginResponseDto loginUser = new LoginResponseDto(mockToken, "1", Role.USER, "user");
+        when(userService.loginAndReturnUserWithToken(any())).thenReturn(loginUser);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,6 +82,18 @@ public class AuthControllerTest {
                 .andExpect(cookie().maxAge("token", 3600)) // 60 * 60
                 .andExpect(jsonPath("$.username").value("user"))
                 .andExpect(jsonPath("$.id").value("1"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/auth/register", "/auth/login"})
+    void return400WhenInputDataEmpty(String url) throws Exception {
+
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(userService);
     }
 }
 
