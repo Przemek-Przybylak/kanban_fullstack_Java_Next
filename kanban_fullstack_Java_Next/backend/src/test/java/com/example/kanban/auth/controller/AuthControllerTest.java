@@ -20,8 +20,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,15 +49,17 @@ public class AuthControllerTest {
     UserResponseDto userResponseDto = new UserResponseDto("1", Role.USER, "user");
 
     @Test
-    void shouldRegisterUserSuccessfully() {
+    void shouldRegisterUserSuccessfully() throws Exception {
         RegisterRequestDto request = new RegisterRequestDto("user", "user");
 
-        when(userService.register(request)).thenReturn(userResponseDto);
+        when(userService.register(any())).thenReturn(userResponseDto);
 
-        UserResponseDto result = userService.register(request);
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("user"));
 
-        assertNotNull(result);
-        assertEquals("user", result.username());
         verify(userService, times(1)).register(any());
     }
 
