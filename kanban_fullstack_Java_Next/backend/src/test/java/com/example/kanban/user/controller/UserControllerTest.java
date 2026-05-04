@@ -5,11 +5,13 @@ import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
+import com.example.kanban.user.model.RoleUpdateRequest;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
@@ -17,7 +19,11 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
 public class UserControllerTest {
@@ -52,6 +58,20 @@ public class UserControllerTest {
         assertEquals(2, result.size());
         assertEquals("user1", result.getFirst().username());
         assertEquals("user2", result.get(1).username());
+    }
+
+    @Test
+    void shouldUpdateUserRole() throws Exception {
+        String userId = "123";
+        RoleUpdateRequest newRole = new RoleUpdateRequest(Role.ADMIN);
+
+        mockMvc.perform(patch("/users/{userId}/role", userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newRole))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(userService).changeUserRole(userId, Role.ADMIN);
     }
 
 
