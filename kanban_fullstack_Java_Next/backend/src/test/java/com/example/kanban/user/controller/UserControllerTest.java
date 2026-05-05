@@ -20,10 +20,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
@@ -54,14 +55,15 @@ public class UserControllerTest {
     RoleUpdateRequest newRole = new RoleUpdateRequest(Role.ADMIN);
 
     @Test
+    @WithMockUser
     void shouldGetAllUsers() throws Exception {
         when(userService.getUsers()).thenReturn(List.of(userResponseDto1, userResponseDto2));
 
-        List<UserResponseDto> result = userService.getUsers();
-
-        assertEquals(2, result.size());
-        assertEquals("user1", result.getFirst().username());
-        assertEquals("user2", result.get(1).username());
+        mockMvc.perform(get("/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].username").value("user1"));
     }
 
     @Test
@@ -69,9 +71,9 @@ public class UserControllerTest {
     void shouldUpdateUserRole() throws Exception {
 
         mockMvc.perform(patch("/users/{userId}/role", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newRole))
-                .with(csrf()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newRole))
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         verify(userService).changeUserRole(userId, Role.ADMIN);
@@ -80,16 +82,15 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void shouldReturn404WhenUserNotFound() throws Exception {
-            doThrow(new NotFoundException("this", "userId"))
-                    .when(userService).changeUserRole(anyString(), any());
+        doThrow(new NotFoundException("this", "userId"))
+                .when(userService).changeUserRole(userId, any());
 
-            mockMvc.perform(patch("/users/{userId}/role", userId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(newRole)))
-                    .andExpect(status().isNotFound());
+        mockMvc.perform(patch("/users/{userId}/role", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newRole))
+                        .with(csrf()))
+                .andExpect(status().isNotFound());
     }
-
-
 }
 
 
