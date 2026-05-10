@@ -73,9 +73,7 @@ public class UserService implements UserServiceInterface {
     }
 
     public String getUserIdFromUsername(final String username) {
-        return userRepository.findByUsername(username)
-                .map(User::getId)
-                .orElseThrow(() -> new NotFoundException("user", "username " + username));
+        return getOwner(username).getId();
     }
 
     public void changeUserRole(final String userId, final Role newRole) {
@@ -107,5 +105,10 @@ public class UserService implements UserServiceInterface {
                 user.getRole(),
                 user.getUsername()
         );
+    }
+
+    public User getOwner(final String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 }

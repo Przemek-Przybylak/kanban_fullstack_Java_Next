@@ -5,9 +5,11 @@ import com.example.kanban.DTO.TaskPatchRequestDto;
 import com.example.kanban.DTO.TaskRequestDto;
 import com.example.kanban.DTO.TaskResponseDto;
 import com.example.kanban.exception.NotFoundException;
+import com.example.kanban.model.Project;
 import com.example.kanban.model.Task;
 import com.example.kanban.model.TaskRepository;
 import com.example.kanban.user.repository.UserRepository;
+import com.example.kanban.user.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +21,14 @@ import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 public class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final ProjectService projectService;
 
-    public TaskService(final TaskRepository taskRepository, final UserRepository userRepository) {
+    public TaskService(final TaskRepository taskRepository, final UserRepository userRepository, final UserService userService, ProjectService projectService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
+        this.projectService = projectService;
     }
 
     @Override
@@ -37,6 +43,31 @@ public class TaskService implements TaskServiceInterface {
     @Override
     public TaskResponseDto getTask(final String id) {
         final var task = getTaskIfExisting(id);
+
+        return Mapper.toDto(task);
+    }
+
+    @Override
+    public List<TaskResponseDto> getTasksByProject(final String id) {
+
+        return taskRepository.findByProjectId(id).stream()
+                .map(Mapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#projectId)")
+    public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
+        final Project project = projectService.getProjectIfExisting(projectId);
+
+        var task = Mapper.fromDto(taskDto);
+
+        final var user = userService.getOwner(taskDto.username());
+
+        task.setUser(user);
+        task.setProject(project);
+
+        taskRepository.save(task);
 
         return Mapper.toDto(task);
     }

@@ -1,12 +1,14 @@
 package com.example.kanban.service;
 
-import com.example.kanban.DTO.*;
+import com.example.kanban.DTO.Mapper;
+import com.example.kanban.DTO.ProjectPatchRequestDto;
+import com.example.kanban.DTO.ProjectRequestDto;
+import com.example.kanban.DTO.ProjectResponseDto;
 import com.example.kanban.exception.ForbiddenException;
 import com.example.kanban.exception.NotFoundException;
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.model.TaskRepository;
-import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,42 +22,12 @@ import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 @Service
 public class ProjectService implements ProjectServiceInterface {
     private final ProjectRepository projectRepository;
-    private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
 
 
     public ProjectService(final ProjectRepository projectRepository, final TaskRepository taskRepository, final UserRepository userRepository, final UserService userService) {
         this.projectRepository = projectRepository;
-        this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
         this.userService = userService;
-    }
-
-    @Override
-    public List<TaskResponseDto> getTasksByProject(final String id) {
-        final var taskList = taskRepository.findByProjectId(id).stream()
-                .map(Mapper::toDto)
-                .toList();
-
-        return taskList;
-    }
-
-    @Override
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#projectId)")
-    public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
-        final Project project = getProjectIfExisting(projectId);
-
-        var task = Mapper.fromDto(taskDto);
-
-        final var user = getOwner(taskDto.username());
-
-        task.setUser(user);
-        task.setProject(project);
-
-        taskRepository.save(task);
-
-        return Mapper.toDto(task);
     }
 
     @Override
@@ -76,7 +48,7 @@ public class ProjectService implements ProjectServiceInterface {
 
     @Override
     public ProjectResponseDto addProject(final ProjectRequestDto projectDto, final String username) {
-        var owner = getOwner(username);
+        var owner = userService.getOwner(username);
         var project = Mapper.fromDto(projectDto);
 
         final var savedProject = projectRepository.save(project);
@@ -128,14 +100,9 @@ public class ProjectService implements ProjectServiceInterface {
         projectRepository.delete(project);
     }
 
-    private Project getProjectIfExisting(final String id) {
+    public Project getProjectIfExisting(final String id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("project", "id: " + id));
-    }
-
-    private User getOwner(final String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("user", "username " + username));
     }
 
     private void checkProjectMembership(final String username, final Project project) {
