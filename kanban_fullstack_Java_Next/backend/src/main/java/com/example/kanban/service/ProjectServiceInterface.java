@@ -11,11 +11,6 @@ import java.util.List;
 public interface ProjectServiceInterface {
 
     @Transactional(readOnly = true)
-    List<TaskResponseDto> getTasksByProject(String id);
-
-    TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username);
-
-    @Transactional(readOnly = true)
     List<ProjectResponseDto> getAllProjects();
 
     @Transactional(readOnly = true)

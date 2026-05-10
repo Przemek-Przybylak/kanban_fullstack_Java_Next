@@ -15,6 +15,12 @@ public interface TaskServiceInterface {
     @Transactional(readOnly = true)
     TaskResponseDto getTask(String id);
 
+    @Transactional(readOnly = true)
+    List<TaskResponseDto> getTasksByProject(String id);
+
+    TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username);
+
+
     TaskResponseDto editTask(String id, TaskRequestDto taskDto, String username);
 
     TaskResponseDto editPartialTask(String id, TaskPatchRequestDto task, String username);
