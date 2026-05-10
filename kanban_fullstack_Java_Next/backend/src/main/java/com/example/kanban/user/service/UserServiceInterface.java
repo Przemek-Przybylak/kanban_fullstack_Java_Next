@@ -5,7 +5,6 @@ import com.example.kanban.user.dto.LoginResponseDto;
 import com.example.kanban.user.dto.RegisterRequestDto;
 import com.example.kanban.user.dto.UserResponseDto;
 import com.example.kanban.user.model.Role;
-import com.example.kanban.user.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -15,8 +14,6 @@ public interface UserServiceInterface {
     UserResponseDto register(final RegisterRequestDto requestDto);
 
     LoginResponseDto loginAndReturnUserWithToken(final LoginRequestDto requestDto);
-
-    User getUserById(final String id);
 
     String getUserIdFromUsername(final String username);
 

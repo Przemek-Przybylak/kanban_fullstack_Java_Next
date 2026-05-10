@@ -66,12 +66,6 @@ public class UserService implements UserServiceInterface {
         );
     }
 
-    public User getUserById(final String id) {
-
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("user", "id: " + id));
-    }
-
     public String getUserIdFromUsername(final String username) {
         return getOwner(username).getId();
     }
