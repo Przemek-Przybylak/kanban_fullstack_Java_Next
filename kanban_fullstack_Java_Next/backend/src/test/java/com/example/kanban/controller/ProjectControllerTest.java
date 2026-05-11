@@ -109,7 +109,7 @@ public class ProjectControllerTest {
                 new TaskResponseDto("1", "title 1", "description 1", "TODO", null, null, null, projectShort, "admin")
         );
 
-        when(projectService.getTasksByProject(project.id())).thenReturn(tasks);
+        when(taskService.getTasksByProject(project.id())).thenReturn(tasks);
 
         mockMvc.perform(get("/projects/{id}/tasks", project.id())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -127,7 +127,7 @@ public class ProjectControllerTest {
         TaskRequestDto task = new TaskRequestDto("title 1", "description 1", "TODO", null, null, "admin", "1.1");
         TaskResponseDto addedTask = new TaskResponseDto("1.1", "title 2", "description 2", "TODO", null, null, null, projectShort, "admin");
 
-        when(projectService.addTask(eq(projectId), any(TaskRequestDto.class), eq("admin")))
+        when(taskService.addTask(eq(projectId), any(TaskRequestDto.class), eq("admin")))
                 .thenReturn(addedTask);
 
         mockMvc.perform(post("/projects/{id}/tasks", projectId)
@@ -227,7 +227,7 @@ public class ProjectControllerTest {
                 .when(projectService).addProject(any(), anyString());
 
         doThrow(new ForbiddenException("task"))
-                .when(projectService).addTask(anyString(), any(), anyString());
+                .when(taskService).addTask(anyString(), any(), anyString());
 
         doThrow(new ForbiddenException("project"))
                 .when(projectService).editProject(anyString(), any(), anyString());
