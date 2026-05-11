@@ -30,12 +30,12 @@ public class ProjectController {
     @GetMapping("/{projectId}/tasks")
     public ResponseEntity<List<TaskResponseDto>> getTasksByProject(@PathVariable String projectId) {
 
-        return ResponseEntity.ok(projectService.getTasksByProject(projectId));
+        return ResponseEntity.ok(taskService.getTasksByProject(projectId));
     }
 
     @PostMapping("/{projectId}/tasks")
     public ResponseEntity<TaskResponseDto> addTask(@PathVariable String projectId, @Validated(OnCreate.class) @RequestBody TaskRequestDto taskDto, Authentication authentication) {
-        TaskResponseDto taskResponseDto = projectService.addTask(projectId, taskDto, authentication.getName());
+        TaskResponseDto taskResponseDto = taskService.addTask(projectId, taskDto, authentication.getName());
 
         URI location = LocationUtil.buildLocation(taskResponseDto.id());
 
