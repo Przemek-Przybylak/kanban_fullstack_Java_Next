@@ -14,11 +14,13 @@ import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,6 +32,7 @@ public class UserService implements UserServiceInterface {
         this.jwtUtil = jwtUtil;
     }
 
+    @Transactional
     public UserResponseDto register(final RegisterRequestDto requestDto) {
         Optional<User> isUsernameUse = userRepository.findByUsername(requestDto.
                 username());
@@ -70,6 +73,7 @@ public class UserService implements UserServiceInterface {
         return getOwner(username).getId();
     }
 
+    @Transactional
     public void changeUserRole(final String userId, final Role newRole) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user", "id" + userId));
@@ -79,7 +83,6 @@ public class UserService implements UserServiceInterface {
         }
 
         user.setRole(newRole);
-        userRepository.save(user);
     }
 
     public List<UserResponseDto> getUsers() {

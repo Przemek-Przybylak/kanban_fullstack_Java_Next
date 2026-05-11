@@ -19,9 +19,7 @@ public interface UserServiceInterface {
 
     void changeUserRole(final String userId, final Role newRole);
 
-    @Transactional(readOnly = true)
     List<UserResponseDto> getUsers();
 
-    @Transactional(readOnly = true)
     UserResponseDto getMeFromToken(String token);
 }
