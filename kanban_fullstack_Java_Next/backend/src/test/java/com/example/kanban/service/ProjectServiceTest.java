@@ -42,6 +42,9 @@ public class ProjectServiceTest {
     @InjectMocks
     ProjectService projectService;
 
+     @InjectMocks
+    TaskService taskService;
+
     @Test
     void shouldReturnProjectTasks() {
         Project project1 = new Project();
@@ -65,7 +68,7 @@ public class ProjectServiceTest {
         when(taskRepository.findByProjectId("p1"))
                 .thenReturn(List.of(task1, task2));
 
-        List<TaskResponseDto> result = projectService.getTasksByProject("p1");
+        List<TaskResponseDto> result = taskService.getTasksByProject("p1");
 
         assertEquals(2, result.size());
     }
@@ -91,7 +94,7 @@ public class ProjectServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArgument(0));
 
-        TaskResponseDto result = projectService.addTask(projectId, requestDto, username);
+        TaskResponseDto result = taskService.addTask(projectId, requestDto, username);
 
         assertNotNull(result);
         assertEquals("t1", result.title());
@@ -105,7 +108,7 @@ public class ProjectServiceTest {
         when(projectRepository.findById("p1")).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> projectService.addTask("p1", task, "u1"));
+                () -> taskService.addTask("p1", task, "u1"));
 
         assertTrue(exception.getMessage().contains("Not found project"));
     }
@@ -164,7 +167,6 @@ public class ProjectServiceTest {
     @Test
     void shouldDeleteProject() {
         String projectId = "123";
-        String username = "u1";
         Project project = new Project();
         project.setId(projectId);
         project.setUsers(new ArrayList<>());
