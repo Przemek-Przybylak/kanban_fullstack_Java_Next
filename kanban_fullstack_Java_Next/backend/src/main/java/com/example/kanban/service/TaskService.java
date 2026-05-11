@@ -138,6 +138,3 @@ public class TaskService implements TaskServiceInterface {
                 .orElseThrow(() -> new NotFoundException("task", "id: " + id));
     }
 }
-
-
-// TODO wywal transactiin z interfacow servisow, nastepnie wez po prznosinach dostosuj projekt i task kontroler
