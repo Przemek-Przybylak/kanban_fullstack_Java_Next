@@ -13,6 +13,7 @@ import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,7 @@ import java.util.Objects;
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
+@Transactional(readOnly = true)
 public class ProjectService implements ProjectServiceInterface {
     private final ProjectRepository projectRepository;
     private final UserService userService;
@@ -47,6 +49,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @Transactional
     public ProjectResponseDto addProject(final ProjectRequestDto projectDto, final String username) {
         var owner = userService.getOwner(username);
         var project = Mapper.fromDto(projectDto);
@@ -62,6 +65,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editProject(final String id, final ProjectRequestDto projectDto, final String username) {
         var existingProject = getProjectIfExisting(id);
@@ -75,6 +79,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public ProjectResponseDto editPartialProject(final String id, final ProjectPatchRequestDto project, final String username) {
         var existingProject = getProjectIfExisting(id);
@@ -88,6 +93,7 @@ public class ProjectService implements ProjectServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#id)")
     public void deleteProject(final String id) {
         final var project = getProjectIfExisting(id);

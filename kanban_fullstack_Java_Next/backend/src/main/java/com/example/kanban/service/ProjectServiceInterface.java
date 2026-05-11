@@ -10,10 +10,8 @@ import java.util.List;
 @Transactional
 public interface ProjectServiceInterface {
 
-    @Transactional(readOnly = true)
     List<ProjectResponseDto> getAllProjects();
 
-    @Transactional(readOnly = true)
     ProjectResponseDto getProject(String id);
 
     ProjectResponseDto addProject(ProjectRequestDto project, String username);
