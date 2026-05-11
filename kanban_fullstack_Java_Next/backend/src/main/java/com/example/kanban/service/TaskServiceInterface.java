@@ -9,13 +9,11 @@ import java.util.List;
 
 @Transactional
 public interface TaskServiceInterface {
-    @Transactional(readOnly = true)
+
     List<TaskResponseDto> getAllTasks();
 
-    @Transactional(readOnly = true)
     TaskResponseDto getTask(String id);
 
-    @Transactional(readOnly = true)
     List<TaskResponseDto> getTasksByProject(String id);
 
     TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username);

@@ -12,12 +12,14 @@ import com.example.kanban.user.repository.UserRepository;
 import com.example.kanban.user.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static com.example.kanban.util.UpdateIfNotNull.updateIfNotNull;
 
 @Service
+@Transactional(readOnly = true)
 public class TaskService implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
@@ -56,6 +58,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessProject(#projectId)")
     public TaskResponseDto addTask(final String projectId, final TaskRequestDto taskDto, final String username) {
         final Project project = projectService.getProjectIfExisting(projectId);
@@ -73,6 +76,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public TaskResponseDto editTask(final String id, final TaskRequestDto taskDto, final String username) {
         Task existingTask = getTaskIfExisting(id);
@@ -91,6 +95,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public TaskResponseDto editPartialTask(final String id, final TaskPatchRequestDto taskDto, final String username) {
         var existingTask = getTaskIfExisting(id);
@@ -107,6 +112,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#id)")
     public void deleteTask(final String id, final String username) {
         final var task = taskRepository.findById(id)
@@ -116,6 +122,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('ROLE_ADMIN') or @guard.canAccessTask(#taskId)")
     public void updateStatus(final String taskId, final String newStatus) {
         var task = taskRepository.findById(taskId)
@@ -131,3 +138,6 @@ public class TaskService implements TaskServiceInterface {
                 .orElseThrow(() -> new NotFoundException("task", "id: " + id));
     }
 }
+
+
+// TODO wywal transactiin z interfacow servisow, nastepnie wez po prznosinach dostosuj projekt i task kontroler
