@@ -55,7 +55,7 @@ public class UserControllerTest {
     RoleUpdateRequest newRole = new RoleUpdateRequest(Role.ADMIN);
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldGetAllUsers() throws Exception {
         when(userService.getUsers()).thenReturn(List.of(userResponseDto1, userResponseDto2));
 
@@ -83,7 +83,7 @@ public class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     void shouldReturn404WhenUserNotFound() throws Exception {
         doThrow(new NotFoundException("this", "userId"))
-                .when(userService).changeUserRole(userId, any());
+                .when(userService).changeUserRole(eq(userId), any());
 
         mockMvc.perform(patch("/users/{userId}/role", userId)
                         .contentType(MediaType.APPLICATION_JSON)
