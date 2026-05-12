@@ -18,7 +18,6 @@ public interface TaskServiceInterface {
 
     TaskResponseDto addTask(String projectId, TaskRequestDto taskDto, String username);
 
-
     TaskResponseDto editTask(String id, TaskRequestDto taskDto, String username);
 
     TaskResponseDto editPartialTask(String id, TaskPatchRequestDto task, String username);
