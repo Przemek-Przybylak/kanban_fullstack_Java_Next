@@ -26,9 +26,9 @@ public class ResourceGuard {
     }
 
     public boolean canAccessTask(String id) {
-        String user = SecurityContextHolder.getContext().getAuthentication().getName();
+        
         return taskRepository.findById(id)
-                .map(t -> t.getUser().getUsername().equals(user))
+                .map(t -> canAccessProject(t.getProject().getId()))
                 .orElse(false);
     }
 }

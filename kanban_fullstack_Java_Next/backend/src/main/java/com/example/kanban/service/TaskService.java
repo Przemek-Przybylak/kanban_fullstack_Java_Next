@@ -26,11 +26,11 @@ public class TaskService implements TaskServiceInterface {
     private final UserService userService;
     private final ProjectService projectService;
 
-    public TaskService(final TaskRepository taskRepository, final UserRepository userRepository, final UserService userService, ProjectService projectService) {
+    public TaskService(final TaskRepository taskRepository, final UserRepository userRepository, final ProjectService projectService, final UserService userService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
         this.projectService = projectService;
+        this.userService = userService;
     }
 
     @Override
@@ -43,6 +43,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("@guard.canAccessTask(#id)")
     public TaskResponseDto getTask(final String id) {
         final var task = getTaskIfExisting(id);
 
@@ -50,6 +51,7 @@ public class TaskService implements TaskServiceInterface {
     }
 
     @Override
+    @PreAuthorize("@guard.canAccessProject(#id)")
     public List<TaskResponseDto> getTasksByProject(final String id) {
 
         return taskRepository.findByProjectId(id).stream()
