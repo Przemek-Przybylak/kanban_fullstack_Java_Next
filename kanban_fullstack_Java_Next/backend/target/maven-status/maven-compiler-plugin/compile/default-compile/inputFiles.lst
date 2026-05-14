@@ -1,3 +1,4 @@
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\auth\controller\AuthController.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\DataInitializer.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\JwtCookieFilter.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\config\OpenApiConfig.java
@@ -15,6 +16,7 @@ D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\examp
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskRequestDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskResponseDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\DTO\TaskStatusRequest.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\BadRequestException.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ConflictException.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ErrorResponse.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\exception\ForbiddenException.java
@@ -32,8 +34,9 @@ D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\examp
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\service\ProjectServiceInterface.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\service\TaskService.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\service\TaskServiceInterface.java
-D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\controller\AuthController.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\controller\UserController.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\dto\LoginRequestDto.java
+D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\dto\LoginResponseDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\dto\RegisterRequestDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\dto\UserResponseDto.java
 D:\fullstack_projects\kanban_fullstack_Java_Next\backend\src\main\java\com\example\kanban\user\model\Role.java

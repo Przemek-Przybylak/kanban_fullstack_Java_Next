@@ -155,7 +155,7 @@ export async function logoutUser() {
 }
 
 export async function getUsers() {
-  const res = await fetch(`${BASE_URL}/auth/users`, {
+  const res = await fetch(`${BASE_URL}/users`, {
     method: "GET",
     credentials: "include",
   });
@@ -164,7 +164,7 @@ export async function getUsers() {
 }
 
 export async function changeRole(userId: string, newRole: string) {
-  const res = await fetch(`${BASE_URL}/auth/${userId}/role`, {
+  const res = await fetch(`${BASE_URL}/users/${userId}/role`, {
     method: "PATCH",
     credentials: "include",
     headers: {
