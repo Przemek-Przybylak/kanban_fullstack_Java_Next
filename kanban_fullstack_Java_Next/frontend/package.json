@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "deploy": "refresh.bat"
+    "test": "jest"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
