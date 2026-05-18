@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +21,20 @@ import com.example.kanban.user.repository.UserRepository;;;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "spring.datasource.url=jdbc:postgresql://ep-patient-tooth-ag1qmdkz-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+        "spring.datasource.username=neondb_owner",
+        "spring.datasource.password=npg_pJZQeK5LbY1U",
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+        "spring.jpa.hibernate.ddl-auto=update"
+})
 @Transactional
 public class ProjectSecurityIntegrationTest {
     
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Autowired
     private ProjectRepository projectRepository;
 
     @MockitoBean
