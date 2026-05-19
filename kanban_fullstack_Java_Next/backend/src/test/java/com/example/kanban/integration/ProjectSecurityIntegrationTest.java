@@ -13,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -68,7 +69,7 @@ public class ProjectSecurityIntegrationTest {
     @Test
     @WithMockUser(username = "nonPrzemek")
     public void shouldBlockAccessForNonPrzemek() throws Exception {
-        mockMvc.perform(get("/projects/" + projectId))
+        mockMvc.perform(delete("/projects/" + projectId))
                 .andExpect(status().isForbidden());
     }
 }
