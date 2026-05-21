@@ -11,19 +11,25 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${app.jwt.secret}")
-    public String secret;
+    // 1. Pola zmieniamy na final (dobra praktyka, gwarancja stabilności)
+    private final String secret;
+    private final long jwtExpiration;
 
-    @Value("${app.jwt.expiration}")
-    public  long jwtExpiration;
+    // 2. Przenosimy adnotacje @Value do konstruktora
+    public JwtUtil(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.expiration}") long jwtExpiration
+    ) {
+        this.secret = secret;
+        this.jwtExpiration = jwtExpiration;
+    }
 
-    private  SecretKey getSigningKey() {
+    // 3. Teraz ta metoda nigdy nie dostanie wartości null
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(String username) {
-
-
         return Jwts.builder()
                 .header().add("typ", "JWT").and()
                 .subject(username)
