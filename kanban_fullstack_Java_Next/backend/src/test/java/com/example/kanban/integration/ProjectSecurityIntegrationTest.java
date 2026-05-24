@@ -1,47 +1,47 @@
 package com.example.kanban.integration;
 
 import com.example.kanban.model.Project;
+import com.example.kanban.model.ProjectRepository;
 import com.example.kanban.user.model.User;
-
+import com.example.kanban.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import com.example.kanban.model.ProjectRepository;
-import com.example.kanban.user.repository.UserRepository;;;
 
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application.properties")
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:postgresql://ep-patient-tooth-ag1qmdkz-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require",
-        "spring.datasource.username=neondb_owner",
-        "spring.datasource.password=npg_pJZQeK5LbY1U",
-        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
-        "spring.jpa.hibernate.ddl-auto=update"
-})
+@ActiveProfiles("test")
+@Testcontainers
 @Transactional
 public class ProjectSecurityIntegrationTest {
-    
+
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ProjectRepository projectRepository;
 
-    @MockitoBean
+    @Autowired
     private UserRepository userRepository;
 
-    private String projectId; 
+    private String projectId;
 
     @BeforeEach
     void setUp() {
@@ -52,11 +52,26 @@ public class ProjectSecurityIntegrationTest {
 
         Project project = new Project();
         project.setTitle("Test Project");
-       
-        project.getUsers().add(user); 
+
+        project.getUsers().add(user);
 
         Project savedProject = projectRepository.save(project);
         projectId = savedProject.getId();
+    }
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Test
+    void contextLoads() {
+
     }
 
     @Test
