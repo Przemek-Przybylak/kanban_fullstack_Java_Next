@@ -21,6 +21,6 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
 
-        registry.add("app.jwt.secret", () -> "super_tajny_losowy_klucz_testowy_ktory_ma_ponad_32_znaki_zeby_nie_bylo_bledu");
+        registry.add("app.jwt.secret", () -> "9zXvR2wK4mP7qT9sB2vK4mP7qT9sB2vK4mP7qT9sB2vK4mP7qT9sB2vK4mP7qT9s");
     }
 }
