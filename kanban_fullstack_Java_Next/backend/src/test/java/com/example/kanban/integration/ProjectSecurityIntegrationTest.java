@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Testcontainers
 @Transactional
-public class ProjectSecurityIntegrationTest {
+public class ProjectSecurityIntegrationTest extends BaseIntegrationTest{
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,19 +59,8 @@ public class ProjectSecurityIntegrationTest {
         projectId = savedProject.getId();
     }
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
-
     @Test
     void contextLoads() {
-
     }
 
     @Test
