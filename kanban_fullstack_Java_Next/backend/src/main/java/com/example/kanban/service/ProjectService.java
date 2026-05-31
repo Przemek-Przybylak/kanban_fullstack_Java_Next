@@ -59,8 +59,6 @@ public class ProjectService implements ProjectServiceInterface {
         project.getUsers().add(owner);
         owner.getProjects().add(project);
 
-        checkProjectMembership(username, project);
-
         return Mapper.toDto(savedProject);
     }
 
