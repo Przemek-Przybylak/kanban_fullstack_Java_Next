@@ -1,5 +1,10 @@
 package com.example.kanban.integration;
 
+import com.example.kanban.model.Project;
+import com.example.kanban.model.ProjectRepository;
+import com.example.kanban.user.model.User;
+import com.example.kanban.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -24,8 +29,32 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected MockMvc mockMvc;
 
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    protected String projectId;
+
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
+
+    @BeforeEach
+    void setUp() {
+        User user = new User();
+        user.setUsername("przemek");
+        user.setPassword("password");
+        userRepository.save(user);
+
+        Project project = new Project();
+        project.setTitle("Test Project");
+
+        project.getUsers().add(user);
+
+        Project savedProject = projectRepository.save(project);
+        projectId = savedProject.getId();
+    }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
