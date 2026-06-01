@@ -54,10 +54,10 @@ public class ProjectService implements ProjectServiceInterface {
         var owner = userService.getOwner(username);
         var project = Mapper.fromDto(projectDto);
 
-        final var savedProject = projectRepository.save(project);
-
         project.getUsers().add(owner);
         owner.getProjects().add(project);
+
+        final var savedProject = projectRepository.save(project);
 
         return Mapper.toDto(savedProject);
     }
