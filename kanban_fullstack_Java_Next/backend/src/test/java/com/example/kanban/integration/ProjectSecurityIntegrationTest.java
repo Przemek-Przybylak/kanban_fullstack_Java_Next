@@ -10,10 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ProjectSecurityIntegrationTest extends BaseIntegrationTest {
 
     @Test
-    void contextLoads() {
-    }
-
-    @Test
     @WithMockUser(username = "przemek")
     public void shouldAllowAccessForPrzemek() throws Exception {
         mockMvc.perform(get("/projects/" + projectId))
