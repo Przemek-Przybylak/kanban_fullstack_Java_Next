@@ -2,6 +2,7 @@ package com.example.kanban.integration;
 
 import com.example.kanban.model.Project;
 import com.example.kanban.model.ProjectRepository;
+import com.example.kanban.user.model.Role;
 import com.example.kanban.user.model.User;
 import com.example.kanban.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,15 +37,17 @@ public abstract class BaseIntegrationTest {
     private UserRepository userRepository;
 
     protected String projectId;
+    protected Project savedProject;
+    protected User user = new User();
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
 
     @BeforeEach
     void setUp() {
-        User user = new User();
         user.setUsername("przemek");
         user.setPassword("password");
+        user.setRole(Role.ADMIN);
         userRepository.save(user);
 
         Project project = new Project();
@@ -52,7 +55,7 @@ public abstract class BaseIntegrationTest {
 
         project.getUsers().add(user);
 
-        Project savedProject = projectRepository.save(project);
+        savedProject = projectRepository.save(project);
         projectId = savedProject.getId();
     }
 
