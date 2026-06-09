@@ -22,4 +22,10 @@ public class ProjectSecurityIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(delete("/projects/" + projectId))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    public void shouldBlockAccessForNotLoggedUser() throws Exception {
+        mockMvc.perform(delete("/projects/" + projectId))
+                .andExpect(status().isUnauthorized());
+    }
 }
