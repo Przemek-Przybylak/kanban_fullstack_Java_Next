@@ -25,7 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application.properties")
 @Transactional
-public abstract class BaseIntegrationTest {
+public abstract class BaseTestConfig {
 
     @Autowired
     protected MockMvc mockMvc;
